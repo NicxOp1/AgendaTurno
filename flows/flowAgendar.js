@@ -11,25 +11,26 @@ const flowAgendar = bot
         flowDynamic()
     }
 )         
-  .addAnswer(
-    "Dime el horario que te gustaria el turno",
-    { capture: true },
-    async (ctx, { state,flowDynamic }) => {
-      
-      await state.update({ horario: ctx.body })
-      await state.update({ telefono: ctx.from })
-      const myState = state.getMyState()
-      console.log(myState)
+.addAnswer(
+  "Dime el horario que te gustaria el turno",
+  { capture: true },
+  async (ctx, { state,flowDynamic }) => {
+    
+    await state.update({ horario: ctx.body })
+    await state.update({ telefono: ctx.from })
+    const myState = state.getMyState()
+    console.log(myState)
 
-      const validarHorarios=await checkAvailability(myState.dia,myState.horario,myState.servicio)
-      await flowDynamic('Bien,los siguientes horarios disponibles son :');
-      for(const horarios of validarHorarios){
-        await flowDynamic(
+    const validarHorarios=await checkAvailability(myState.dia,myState.horario,myState.servicio)
+        await flowDynamic('Bien,los siguientes horarios disponibles son :');
+        for(const horarios of validarHorarios){
+            await flowDynamic(
           `Inicio: ${formatDate(horarios.startTime)} ${formatTime(horarios.startTime)}, Fin: ${formatDate(horarios.endTime)} ${formatTime(slot.endTime)}`
         )
       }
-    }
-  )
+  }
+)
+
   export default flowAgendar
 
 
