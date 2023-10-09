@@ -1,8 +1,8 @@
 import bot from "@bot-whatsapp/bot";
-import checkAvailability from '../services/sheets/index.js'
+import consultarTurnos from '../services/sheets/index.js'
 
 const flowAgendar = bot
-.addKeyword('bot')
+.addKeyword('PERDO')
 .addAnswer(
     '¿Cual es tu nombre?',
     {capture: true},
@@ -11,26 +11,26 @@ const flowAgendar = bot
         flowDynamic()
     }
 )         
-.addAnswer(
-  "Dime el horario que te gustaria el turno",
-  { capture: true },
-  async (ctx, { state,flowDynamic }) => {
-    
-    await state.update({ horario: ctx.body })
-    await state.update({ telefono: ctx.from })
-    const myState = state.getMyState()
-    console.log(myState)
-
-    const validarHorarios=await checkAvailability(myState.dia,myState.horario,myState.servicio)
-        await flowDynamic('Bien,los siguientes horarios disponibles son :');
-        for(const horarios of validarHorarios){
-            await flowDynamic(
-          `Inicio: ${formatDate(horarios.startTime)} ${formatTime(horarios.startTime)}, Fin: ${formatDate(horarios.endTime)} ${formatTime(slot.endTime)}`
+  .addAnswer(
+    "Dime el horario que te gustaria el turno",
+    { capture: true },
+    async (ctx, { state,flowDynamic }) => {
+        if(/^(10:00|1[0-8]:[0-2]\d|18:30)$/.test(ctx.body)){
+          await state.update({ horario: ctx.body })
+          await state.update({ telefono: ctx.from })
+        }else{
+          return 'lo siento , escribiste mal el horario, recorda que solo aceptamos turnos de 10:00 a 18:30'
+        }
+      const myState = state.getMyState()
+      console.log(myState)
+      const verTurnos= await consultarTurnos(myState.telefono)
+      console.log(verTurnos)
+        await flowDynamic(
+          `turnos: ${verTurnos}`
         )
       }
-  }
-)
-
+    
+  )
   export default flowAgendar
 
 
@@ -84,3 +84,26 @@ return consultados
 
 };
  */
+
+
+
+
+
+
+
+
+
+/* ESTO VA DE EJEMPLO
+
+
+
+*/
+/* 
+const fechaSolicitada = '04/10/23'; // Fecha en formato DD/MM/YY
+const horaSolicitada = '13:00'; // Hora solicitada
+const servicioSolicitado = 'Esculpidas'; // Nombre del servicio
+const numeroTelefono = '5491140314482'; // Número de teléfono
+
+const resultado = await agendarTurno(fechaSolicitada, horaSolicitada, servicioSolicitado, numeroTelefono);
+
+console.log(resultado); */
