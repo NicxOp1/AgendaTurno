@@ -1,38 +1,54 @@
 import bot from "@bot-whatsapp/bot";
-import consultarTurnos from '../services/sheets/index.js'
+import { consultarTurnos,agendarTurno} from "../services/sheets/index.js";
 
 const flowAgendar = bot
-.addKeyword('PERDO')
-.addAnswer(
-    '¿Cual es tu nombre?',
-    {capture: true},
+  .addKeyword("PERDO")
+  .addAnswer(
+    "¿Cual es tu nombre?",
+    { capture: true },
     async (ctx, { flowDynamic, state }) => {
-        await state.update({ nombre: ctx.body })
-        flowDynamic()
+      await state.update({ nombre: ctx.body });
+      flowDynamic();
     }
-)         
+  )
   .addAnswer(
     "Dime el horario que te gustaria el turno",
     { capture: true },
-    async (ctx, { state,flowDynamic }) => {
-        if(/^(10:00|1[0-8]:[0-2]\d|18:30)$/.test(ctx.body)){
-          await state.update({ horario: ctx.body })
-          await state.update({ telefono: ctx.from })
-        }else{
-          return 'lo siento , escribiste mal el horario, recorda que solo aceptamos turnos de 10:00 a 18:30'
-        }
-      const myState = state.getMyState()
-      console.log(myState)
-      const verTurnos= await consultarTurnos(myState.telefono)
-      console.log(verTurnos)
+    async (ctx, { state, flowDynamic }) => {
+      if (/^(10:00|1[0-8]:[0-2]\d|18:30)$/.test(ctx.body)) {
+        await state.update({ horario: ctx.body });
+        await state.update({ telefono: ctx.from });
+      } else {
+        return "Lo siento , escribiste mal el horario, recorda que solo aceptamos turnos de 10:00 a 18:30";
+      }
+      /* state.getMyState(); */
+      const myState = {
+        dia: '10/10/23',
+        servicio: 'Esculpidas',
+        nombre: 'Nico',
+        horario: '12:00',
+        telefono: '5491136763143'
+      }
+      console.log(myState);
+/*       const verTurnos = await consultarTurnos(myState.telefono);
+      console.log(verTurnos); */
+/*       if (verTurnos) {
         await flowDynamic(
-          `turnos: ${verTurnos}`
-        )
+          `Vaya!, parece que ya tenias un turno: ${JSON.stringify(verTurnos)}`
+        );
+      } else { */
+        const agendar = await agendarTurno(
+          myState.dia,
+          myState.horario,
+          myState.servicio,
+          myState.nombre,
+          myState.telefono
+        );
+        console.log(agendar);
       }
     
-  )
-  export default flowAgendar
-
+  );
+export default flowAgendar;
 
 /* 
 
@@ -84,14 +100,6 @@ return consultados
 
 };
  */
-
-
-
-
-
-
-
-
 
 /* ESTO VA DE EJEMPLO
 
