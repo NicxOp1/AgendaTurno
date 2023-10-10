@@ -2,6 +2,7 @@ import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import moment from "moment";
 
+
 const serviceAccountAuth = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
   key: process.env.GOOGLE_PRIVATE_KEY,
@@ -12,31 +13,17 @@ const doc = new GoogleSpreadsheet(
   serviceAccountAuth
 );
 
-// Función para formatear la fecha en "dd/mm/yyyy"
-function formatDate(date) {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
-
-// Función para formatear la hora en "hh:mm"
-function formatTime(date) {
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-}
 
 export const consultarTurnos = async (telefono) => {
   let turnos = {
     Fecha: [],
-    "Hora de inicio": [],
-    "Hora de finalización": [],
+    Inicio: [],
+    Finalización: [],
     Servicio: [],
     Cliente: [],
     Telefono: [],
   };
-  const CREDENTIALS = {
+/*   const CREDENTIALS = {
     type: "service_account",
     project_id: "calendar-turnos-400220",
     private_key_id: "0b3dea17024160a280f1a7cee89ccca4686e4f22",
@@ -50,8 +37,8 @@ export const consultarTurnos = async (telefono) => {
     client_x509_cert_url:
       "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
     universe_domain: "googleapis.com",
-  };
-  await doc.useServiceAccountAuth(CREDENTIALS);
+  }; */
+  await doc.useServiceAccountAuth(process.env.CREDENTIALS);
   await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
   let sheet = doc.sheetsByTitle["Hoja 1"];
 
@@ -61,8 +48,8 @@ export const consultarTurnos = async (telefono) => {
     if (row._rawData[5] === telefono) {
       // Suponiendo que el teléfono está en la sexta columna (índice 5).
       turnos["Fecha"].push(row._rawData[0]);
-      turnos["Hora de inicio"].push(row._rawData[1]);
-      turnos["Hora de finalización"].push(row._rawData[2]);
+      turnos["Inicio"].push(row._rawData[1]);
+      turnos["Finalización"].push(row._rawData[2]);
       turnos["Servicio"].push(row._rawData[3]);
       turnos["Cliente"].push(row._rawData[4]);
       turnos["Telefono"].push(row._rawData[5]);
@@ -148,25 +135,29 @@ export const agregarTurno = async(fecha, horaInicio, servicio, cliente, telefono
     const horaFinalizacion = horaFinMoment.format('HH:mm');
    console.log(horaFinalizacion)
     // Crear un nuevo objeto de turno con los datos proporcionados.
-    const nuevoTurno = {
+    let rowse = {
       Fecha: fecha,
-      'Hora de inicio': horaInicio,
-      'Hora de finalización': horaFinalizacion,
+      Inicio: horaInicio,
+      Finalizacion: horaFinalizacion,
       Servicio: servicio,
       Cliente: cliente,
       Telefono: telefono,
-    };
-  
-    // Agregar el nuevo turno a la hoja de cálculo.
-    await sheet.addRow(nuevoTurno);
+    }
+    await doc.useServiceAccountAuth(CREDENTIALS);
+    await doc.loadInfo();
+    let sheets = doc.sheetsByTitle["Hoja 1"];
+    console.log(rowse)
+
+      await sheets.addRow(rowse);
+
 }
 
 
 export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
   let turnos = {
     Fecha: [],
-    "Hora de inicio": [],
-    "Hora de finalización": [],
+    Inicio: [],
+    Finalizacion: [],
     Servicio: [],
     Cliente: [],
     Telefono: [],
@@ -198,8 +189,8 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
     const servicioColumna = row._rawData[3];
     if (fechaColumna === fecha && servicioColumna === servicio) {
       turnos["Fecha"].push(row._rawData[0]);
-      turnos["Hora de inicio"].push(row._rawData[1]);
-      turnos["Hora de finalización"].push(row._rawData[2]);
+      turnos["Inicio"].push(row._rawData[1]);
+      turnos["Finalizacion"].push(row._rawData[2]);
       turnos["Servicio"].push(row._rawData[3]);
       turnos["Cliente"].push(row._rawData[4]);
       turnos["Telefono"].push(row._rawData[5]);
@@ -250,12 +241,12 @@ export const verificarDisponibilidad = async (
   horaFinSolicitada.setHours(horaFinSolicitada.getHours() + duracionServicio);
 
   // Comprueba si hay algún solapamiento con los turnos existentes.
-  for (let i = 0; i < turnosPorDiaYServicio["Hora de inicio"].length; i++) {
+  for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
     const horaInicioTurno = new Date(
-      `01/01/2000 ${turnosPorDiaYServicio["Hora de inicio"][i]}`
+      `01/01/2000 ${turnosPorDiaYServicio["Inicio"][i]}`
     );
     const horaFinTurno = new Date(
-      `01/01/2000 ${turnosPorDiaYServicio["Hora de finalización"][i]}`
+      `01/01/2000 ${turnosPorDiaYServicio["Finalizacion"][i]}`
     );
 
     // Verifica si hay solapamiento de horarios.

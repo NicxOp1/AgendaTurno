@@ -5,34 +5,34 @@ const flowBusqueda = bot
 .addKeyword('bot')
 .addAnswer(
     ['Podrias proporcionarme el servicio que buscas realizarte?',
-    '1)💅Esculpidas',
-    '2)💅Kapping con acrilico',
-    '3)💅Kapping con gel',
-    '4)💅Esmaltado Semi-permanente'],
+    'A)💅Esculpidas',
+    'B)💅Kapping con acrilico',
+    'C)💅Kapping con gel',
+    'D)💅Esmaltado Semi-permanente'],
     {capture:true},
     async(ctx,{fallBack,flowDynamic,state,gotoFlow})=>{
-        if(ctx.body==='1'){
+        if(ctx.body==='A'){
             const ServicioSeleccionado = 'Esculpidas'
             await state.update({ servicio: ServicioSeleccionado })
             await gotoFlow(flowAgendar)
             flowDynamic()
-        }else if(ctx.body==='2'){
+        }else if(ctx.body==='B'){
             const ServicioSeleccionado = 'Kapping con acrilico'
             await state.update({ servicio: ServicioSeleccionado })
             await gotoFlow(flowAgendar)
             flowDynamic()
-        }else if(ctx.body==='3'){
+        }else if(ctx.body==='C'){
             const ServicioSeleccionado = 'Kapping con gel'
             await state.update({ servicio: ServicioSeleccionado })
             await gotoFlow(flowAgendar)
             flowDynamic()
-        }else if(ctx.body==='4'){
-            const ServicioSeleccionado = 'Esmaltado Semi-permanente'
+        }else if(ctx.body==='D'){
+            const ServicioSeleccionado = 'Esmaltado Semipermanente'
             await state.update({ servicio: ServicioSeleccionado })
             await gotoFlow(flowAgendar)
             flowDynamic()
         }else{
-            return ('Porfavor vuelve a intentarlo y escribe un numero valido',fallBack)
+            flowDynamic ('Porfavor vuelve a intentarlo y selecciona una opcion valida',fallBack)
         }
     })
 export default flowBusqueda

@@ -36,14 +36,14 @@ function validarFecha(fechaStr) {
 const flowSelecion = bot
   .addKeyword("1") //Reservar un turno
   .addAnswer(
-    "Perfecto! Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/YY"
+    "Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/YY"
   )
   .addAction(
     { capture: true, delay: 2000 },
     async (ctx, { state, fallBack, gotoFlow, flowDynamic }) => {
       const resultado = validarFecha(ctx.body);
       if (!resultado.valido) {
-        return `${resultado.log}`;
+        flowDynamic(resultado.log);
       } else {
         await state.update({ dia: ctx.body });
         return gotoFlow(flowBusqueda);

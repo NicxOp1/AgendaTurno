@@ -1,8 +1,35 @@
 import bot from "@bot-whatsapp/bot";
 import { consultarTurnos,agendarTurno} from "../services/sheets/index.js";
 
+function esHorarioValido(horario) {
+  // Dividir la hora y los minutos
+  var partes = horario.split(':');
+  var hora = parseInt(partes[0]);
+  var minutos = parseInt(partes[1]);
+
+  // Verificar si la hora está entre 10 y 18
+  if (hora < 10 || hora > 18) {
+      return false;
+  }
+
+  // Verificar si los minutos son 00 o 30
+  if (minutos !== 0 && minutos !== 30) {
+      return false;
+  }
+
+  // Verificar si la hora es 18 y los minutos son más de 30
+  if (hora === 18 && minutos > 30) {
+      return false;
+  }
+
+  // Si pasó todas las verificaciones, el horario es válido
+  return true;
+}
+
+
+
 const flowAgendar = bot
-  .addKeyword("PERDO")
+  .addKeyword("bot")
   .addAnswer(
     "¿Cual es tu nombre?",
     { capture: true },
@@ -14,29 +41,12 @@ const flowAgendar = bot
   .addAnswer(
     "Dime el horario que te gustaria el turno",
     { capture: true },
-    async (ctx, { state, flowDynamic }) => {
-      if (/^(10:00|1[0-8]:[0-2]\d|18:30)$/.test(ctx.body)) {
+    async (ctx, { state, flowDynamic,fallBack }) => {
+      if (esHorarioValido(ctx.body)) {
         await state.update({ horario: ctx.body });
         await state.update({ telefono: ctx.from });
-      } else {
-        return "Lo siento , escribiste mal el horario, recorda que solo aceptamos turnos de 10:00 a 18:30";
-      }
-      /* state.getMyState(); */
-      const myState = {
-        dia: '10/10/23',
-        servicio: 'Esculpidas',
-        nombre: 'Nico',
-        horario: '12:00',
-        telefono: '5491136763143'
-      }
-      console.log(myState);
-/*       const verTurnos = await consultarTurnos(myState.telefono);
-      console.log(verTurnos); */
-/*       if (verTurnos) {
-        await flowDynamic(
-          `Vaya!, parece que ya tenias un turno: ${JSON.stringify(verTurnos)}`
-        );
-      } else { */
+        const myState = state.getMyState();
+        console.log(myState.horario);
         const agendar = await agendarTurno(
           myState.dia,
           myState.horario,
@@ -44,7 +54,10 @@ const flowAgendar = bot
           myState.nombre,
           myState.telefono
         );
-        console.log(agendar);
+        flowDynamic(agendar)
+      } else {
+        flowDynamic('Lo siento , escribiste mal el horario, recorda que solo aceptamos turnos de 10:00 a 18:30',
+                    "Solo pueden intervalos de 30'",fallBack)}
       }
     
   );
