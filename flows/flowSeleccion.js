@@ -44,10 +44,11 @@ const flowSelecion = bot
       const resultado = validarFecha(ctx.body);
       if (!resultado.valido) {
         flowDynamic(resultado.log);
+        return gotoFlow(flowSelecion);
       } else {
         await state.update({ dia: ctx.body });
         return gotoFlow(flowBusqueda);
       }
     }
-  );
+  )
 export default flowSelecion;

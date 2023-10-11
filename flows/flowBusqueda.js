@@ -10,7 +10,7 @@ const flowBusqueda = bot
     'C)💅Kapping con gel',
     'D)💅Esmaltado Semi-permanente'],
     {capture:true},
-    async(ctx,{fallBack,flowDynamic,state,gotoFlow})=>{
+    async(ctx,{flowDynamic,state,gotoFlow})=>{
         if(ctx.body==='A'){
             const ServicioSeleccionado = 'Esculpidas'
             await state.update({ servicio: ServicioSeleccionado })
@@ -32,7 +32,8 @@ const flowBusqueda = bot
             await gotoFlow(flowAgendar)
             flowDynamic()
         }else{
-            flowDynamic ('Porfavor vuelve a intentarlo y selecciona una opcion valida',fallBack)
+            flowDynamic ('Porfavor vuelve a intentarlo y selecciona una opcion valida')
+            await gotoFlow(flowBusqueda)
         }
     })
 export default flowBusqueda

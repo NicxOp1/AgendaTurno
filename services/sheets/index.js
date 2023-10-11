@@ -1,7 +1,7 @@
 import { JWT } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import moment from "moment";
-
+import "dotenv/config";
 
 const serviceAccountAuth = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
@@ -13,7 +13,6 @@ const doc = new GoogleSpreadsheet(
   serviceAccountAuth
 );
 
-
 export const consultarTurnos = async (telefono) => {
   let turnos = {
     Fecha: [],
@@ -23,7 +22,7 @@ export const consultarTurnos = async (telefono) => {
     Cliente: [],
     Telefono: [],
   };
-/*   const CREDENTIALS = {
+  const CREDENTIALS = {
     type: "service_account",
     project_id: "calendar-turnos-400220",
     private_key_id: "0b3dea17024160a280f1a7cee89ccca4686e4f22",
@@ -37,8 +36,8 @@ export const consultarTurnos = async (telefono) => {
     client_x509_cert_url:
       "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
     universe_domain: "googleapis.com",
-  }; */
-  await doc.useServiceAccountAuth(process.env.CREDENTIALS);
+  };
+  await doc.useServiceAccountAuth(/* process.env. */ CREDENTIALS);
   await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
   let sheet = doc.sheetsByTitle["Hoja 1"];
 
@@ -78,20 +77,22 @@ export const agendarTurno = async (
     servicio
   );
   if (!disponibilidad) {
-    return "El horario solicitado no está disponible.";
+    return "El horario solicitado no está disponible, porfavor busca otro horario";
   }
 
   // 3. Agregar el nuevo turno a la hoja de cálculo.
-  await agregarTurno(fecha, horaSolicitada, servicio,cliente, telefono);
+  await agregarTurno(fecha, horaSolicitada, servicio, cliente, telefono);
 
   return "Turno agendado con éxito.";
 };
 
-/* */
-
-/* */
-export const agregarTurno = async(fecha, horaInicio, servicio, cliente, telefono) => {
-  
+export const agregarTurno = async (
+  fecha,
+  horaInicio,
+  servicio,
+  cliente,
+  telefono
+) => {
   const CREDENTIALS = {
     type: "service_account",
     project_id: "calendar-turnos-400220",
@@ -106,52 +107,53 @@ export const agregarTurno = async(fecha, horaInicio, servicio, cliente, telefono
     client_x509_cert_url:
       "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
     universe_domain: "googleapis.com",
-  }; 
-    // Asegúrate de tener acceso a tu hoja de cálculo y cargar la información.
-    await doc.useServiceAccountAuth(CREDENTIALS);
-    await doc.loadInfo();
-  
-    // Cargar la duración del servicio desde 'Hoja 2'.
-    let sheet = doc.sheetsByTitle["Hoja 2"];
-    let rows = await sheet.getRows();
-    let duracionServicio;
-    for (let index = 0; index < rows.length; index++) {
-      const row = rows[index];
-      const nombreServicio = row._rawData[0];
-      if (nombreServicio === servicio) {
-        duracionServicio = row._rawData[1];
-        break;
-      }
+  };
+  await doc.useServiceAccountAuth(CREDENTIALS);
+  await doc.loadInfo();
+
+  // Cargar la duración del servicio desde 'Hoja 2'.
+  let sheet = doc.sheetsByTitle["Hoja 2"];
+  let rows = await sheet.getRows();
+  let duracionServicio;
+  for (let index = 0; index < rows.length; index++) {
+    const row = rows[index];
+    const nombreServicio = row._rawData[0];
+    if (nombreServicio === servicio) {
+      duracionServicio = row._rawData[1];
+      break;
     }
-    // Parsear la duración del servicio para obtener las horas y los minutos.
-    const [horasServicio, minutosServicio] = duracionServicio.split(':').map(Number);
-  
-    // Calcular la 'Hora de finalización' basándose en la 'Hora de inicio' y la 'Duración'.
-    const horaInicioMoment = moment(horaInicio, 'HH:mm');
-    
-    const horaFinMoment = moment(horaInicioMoment).add(horasServicio, 'hours').add(minutosServicio, 'minutes');
-  
-    // Formatear la 'Hora de finalización' al formato correcto.
-    const horaFinalizacion = horaFinMoment.format('HH:mm');
-   console.log(horaFinalizacion)
-    // Crear un nuevo objeto de turno con los datos proporcionados.
-    let rowse = {
-      Fecha: fecha,
-      Inicio: horaInicio,
-      Finalizacion: horaFinalizacion,
-      Servicio: servicio,
-      Cliente: cliente,
-      Telefono: telefono,
-    }
-    await doc.useServiceAccountAuth(CREDENTIALS);
-    await doc.loadInfo();
-    let sheets = doc.sheetsByTitle["Hoja 1"];
-    console.log(rowse)
+  }
+  // Parsear la duración del servicio para obtener las horas y los minutos.
+  const [horasServicio, minutosServicio] = duracionServicio
+    .split(":")
+    .map(Number);
 
-      await sheets.addRow(rowse);
+  // Calcular la 'Hora de finalización' basándose en la 'Hora de inicio' y la 'Duración'.
+  const horaInicioMoment = moment(horaInicio, "HH:mm");
 
-}
+  const horaFinMoment = moment(horaInicioMoment)
+    .add(horasServicio, "hours")
+    .add(minutosServicio, "minutes");
 
+  // Formatear la 'Hora de finalización' al formato correcto.
+  const horaFinalizacion = horaFinMoment.format("HH:mm");
+  console.log(horaFinalizacion);
+  // Crear un nuevo objeto de turno con los datos proporcionados.
+  let rowse = {
+    Fecha: fecha,
+    Inicio: horaInicio,
+    Finalizacion: horaFinalizacion,
+    Servicio: servicio,
+    Cliente: cliente,
+    Telefono: telefono,
+  };
+  await doc.useServiceAccountAuth(CREDENTIALS);
+  await doc.loadInfo();
+  let sheets = doc.sheetsByTitle["Hoja 1"];
+  console.log(rowse);
+
+  await sheets.addRow(rowse);
+};
 
 export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
   let turnos = {
@@ -177,7 +179,7 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
     client_x509_cert_url:
       "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
     universe_domain: "googleapis.com",
-  }; 
+  };
   await doc.useServiceAccountAuth(CREDENTIALS);
   await doc.loadInfo();
   let sheet = doc.sheetsByTitle["Hoja 1"];
@@ -212,13 +214,6 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
 
   return turnos;
 };
-/*   
-  // Ejemplo de uso
-  const fechaBuscada = '4/10/23'; // Fecha en formato DD/MM/YY
-  const servicioBuscado = 'Esculpidas'; // Nombre del servicio a buscar
-  const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fechaBuscada, servicioBuscado);
-  console.log(turnosPorDiaYServicio);
-   */
 
 export const verificarDisponibilidad = async (
   fecha,
@@ -263,19 +258,6 @@ export const verificarDisponibilidad = async (
   // No hay solapamiento, está disponible.
   return true;
 };
-/* 
-  // Ejemplo de uso
-  const fechaBuscada = '4/10/23'; // Fecha en formato DD/MM/YY
-  const servicioBuscado = 'Esculpidas'; // Nombre del servicio a buscar
-  const horaSolicitada = '13:00'; // Hora solicitada
-  const disponibilidad = await verificarDisponibilidad(fechaBuscada, horaSolicitada, servicioBuscado);
-  
-  if (disponibilidad) {
-    console.log('El horario solicitado está disponible.');
-  } else {
-    console.log('El horario solicitado no está disponible.');
-  }
-   */
 
 export default {
   consultarTurnos,
