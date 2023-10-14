@@ -71,12 +71,14 @@ export const agendarTurno = async (
   } //aca hay un problema , el mismo registra todos los turnos , por ende si tiene un turno anterior y quiere crear otro no va a poder
 
   // 2. Verificar disponibilidad en la fecha y hora solicitadas.
-  const disponibilidad = await verificarDisponibilidad(
+  const disponibilidad = await verificarYBuscarDisponibilidad(
     fecha,
     horaSolicitada,
     servicio
   );
-  if (!disponibilidad) {
+  console.log (disponibilidad)
+  if (!disponibilidad.HorarioAprobado) {
+    console.log(disponibilidad.HorariosDisponibles)
     return "El horario solicitado no está disponible, porfavor busca otro horario";
   }
 
@@ -121,12 +123,13 @@ export const agregarTurno = async (
     if (nombreServicio === servicio) {
       duracionServicio = row._rawData[1];
       break;
+    }else{
+      return 'Error getting service'
     }
   }
   // Parsear la duración del servicio para obtener las horas y los minutos.
-  const [horasServicio, minutosServicio] = duracionServicio
-    .split(":")
-    .map(Number);
+  console.log(duracionServicio)
+  const [horasServicio, minutosServicio] = duracionServicio.split(":").map(Number);
 
   // Calcular la 'Hora de finalización' basándose en la 'Hora de inicio' y la 'Duración'.
   const horaInicioMoment = moment(horaInicio, "HH:mm");
@@ -259,9 +262,98 @@ export const verificarDisponibilidad = async (
   return true;
 };
 
+
+
+
+
+
+
+
+export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio) => {
+  // Primero verifica la disponibilidad del horario solicitado.
+  const horarioAprobado = await verificarDisponibilidad(fecha, horaSolicitada, servicio);
+
+  if (horarioAprobado) {
+    // Si el horario solicitado está disponible, devuelve solo eso.
+    return {
+      HorarioAprobado: true,
+      HorariosDisponibles: []
+    };
+  } else {
+    // Si el horario solicitado no está disponible, busca los horarios disponibles.
+    const horariosDisponibles = await buscarHorariosDisponibles(fecha, servicio);
+
+    return {
+      HorarioAprobado: false,
+      HorariosDisponibles: horariosDisponibles
+    };
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const buscarHorariosDisponibles = async (fecha, servicio) => {
+  // 1. Obtener todos los turnos para la fecha dada.
+  const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fecha, servicio);
+
+  // 2. Obtener la duración del servicio solicitado.
+  const duracionServicio = turnosPorDiaYServicio["Duración"];
+
+  // 3. Crear una lista de horarios disponibles.
+  let horariosDisponibles = [];
+
+  // 4. Definir el horario de trabajo
+  let horaInicioJornada = new Date(`01/01/2000 10:00`);
+  const horaFinJornada = new Date(`01/01/2000 20:00`);
+
+  while (horaInicioJornada <= horaFinJornada) {
+    let disponible = true;
+    const horaFinSolicitada = new Date(horaInicioJornada);
+    horaFinSolicitada.setHours(horaFinSolicitada.getHours() + duracionServicio);
+
+    if (horaFinSolicitada > horaFinJornada) {
+      break;
+    }
+
+    for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
+      const horaInicioTurno = new Date(`01/01/2000 ${turnosPorDiaYServicio["Inicio"][i]}`);
+      const horaFinTurno = new Date(`01/01/2000 ${turnosPorDiaYServicio["Finalizacion"][i]}`);
+
+      if ((horaInicioJornada >= horaInicioTurno && horaInicioJornada < horaFinTurno) ||
+          (horaFinSolicitada > horaInicioTurno && horaFinSolicitada <= horaFinTurno)) {
+        disponible = false;
+        break;
+      }
+    }
+
+    if (disponible) {
+      horariosDisponibles.push(horaInicioJornada.toTimeString().substring(0,5));
+    }
+
+    // Incrementar la hora de inicio en incrementos de 'duracionServicio'.
+    horaInicioJornada.setHours(horaInicioJornada.getHours() + duracionServicio);
+  }
+
+  return horariosDisponibles;
+};
+
+
 export default {
   consultarTurnos,
   agendarTurno,
   verificarDisponibilidad,
   consultarTurnosPorDiaYServicio,
-};
+  verificarYBuscarDisponibilidad,
+  buscarHorariosDisponibles,
+};  

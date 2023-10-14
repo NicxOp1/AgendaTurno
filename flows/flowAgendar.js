@@ -57,7 +57,8 @@ const flowAgendar = bot
         return endFlow({body: agendar})
         /* flowDynamic(agendar) */
       } else {
-        flowDynamic('Lo siento , escribiste mal el horario, recorda que solo aceptamos turnos de 10:00 a 18:30',
+        flowDynamic('Lo siento , escribiste mal el horario',
+                    'recorda que solo aceptamos turnos de 10:00 a 18:30',
                     "Solo pueden intervalos de 30'")
                     return  await gotoFlow(flowAgendar)
                   }
