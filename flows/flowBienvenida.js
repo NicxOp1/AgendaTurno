@@ -16,8 +16,9 @@ const flowPrincipal = bot
     \n5)❓Preguntas frecuentes`,
     {capture:true}, 
     async (ctx,{gotoFlow})=> {
+      if(ctx.body===1||2||3||4||5){
         await gotoFlow(flowSelecion)
-        console.log(`👉 Informacion del contexto:${ctx.body}`, ctx)
+      }
     })
 
     export default flowPrincipal

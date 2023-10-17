@@ -34,7 +34,7 @@ function validarFecha(fechaStr) {
 }
 
 const flowSelecion = bot
-  .addKeyword("1") //Reservar un turno
+  .addKeyword("1",{ sensitive: true }) //Reservar un turno
   .addAnswer(
     "Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/YY"
   )

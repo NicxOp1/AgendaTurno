@@ -1,5 +1,5 @@
 import bot from "@bot-whatsapp/bot";
-import { consultarTurnos,agendarTurno} from "../services/sheets/index.js";
+import { consultarTurnos, agendarTurno } from "../services/sheets/index.js";
 
 function esHorarioValido(horario) {
   // Dividir la hora y los minutos
@@ -26,19 +26,17 @@ function esHorarioValido(horario) {
   return true;
 }
 
-
-
 const flowAgendar = bot
-  .addKeyword("bot")
-  .addAnswer(
+.addKeyword("bot")
+.addAnswer(
     "¿Cual es tu nombre?",
     { capture: true },
     async (ctx, { flowDynamic, state }) => {
       await state.update({ nombre: ctx.body });
       flowDynamic();
     }
-  )
-  .addAnswer(
+)
+.addAnswer(
     "Dime el horario que te gustaria el turno",
     { capture: true },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
@@ -54,15 +52,21 @@ const flowAgendar = bot
           myState.nombre,
           myState.telefono
         );
-        return endFlow({body: agendar})
-        /* flowDynamic(agendar) */
+        
+        console.log('Resultado de agendarTurno:', agendar);
+        if (agendar.Mensaje) {
+          console.log(agendar.Horarios)
+          flowDynamic(agendar.Mensaje)
+        } else {
+          flowDynamic(agendar)
+        }
       } else {
         flowDynamic('Lo siento , escribiste mal el horario',
                     'recorda que solo aceptamos turnos de 10:00 a 18:30',
                     "Solo pueden intervalos de 30'")
-                    return  await gotoFlow(flowAgendar)
+                    return await gotoFlow(flowAgendar)
                   }
       }
     
-  );
+);
 export default flowAgendar;
