@@ -1,5 +1,5 @@
 import bot from "@bot-whatsapp/bot";
-import { consultarTurnos, agendarTurno } from "../services/sheets/index.js";
+import { consultarTurnos, agendarTurno, buscarDiasDisponibles } from "../services/sheets/index.js";
 
 function esHorarioValido(horario) {
   // Dividir la hora y los minutos
@@ -38,7 +38,7 @@ const flowAgendar = bot
 )
 .addAnswer(
     "Dime el horario que te gustaria el turno",
-    { capture: true },
+    { capture: true, delay : 2000 },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
       if (esHorarioValido(ctx.body)) {
         await state.update({ horario: ctx.body });
@@ -55,8 +55,15 @@ const flowAgendar = bot
         
         console.log('Resultado de agendarTurno:', agendar);
         if (agendar.Mensaje) {
-          console.log(agendar.Horarios)
-          flowDynamic(agendar.Mensaje)
+          flowDynamic(agendar.Mensaje)          
+          let mostrar=agendar.DiasDisponibles.forEach((dia) => {
+            dia.Horarios.forEach((horario) => {
+            return  flowDynamic(`\nPara el día ${dia.Fecha} hay un turno libre para las: ${horario} 
+                            \n Si alguno de estos horarios te sirve, responde con *Messirve*
+                            \n De lo contrario, responde con *Quiero el horario*`);
+            }); //falta resolver el tema de que muestre todos los horarios disponibles que sean posibles , dentro del dia que se mostro , solo llega el primero que seria a las 10:00 si es que no hay algo agendado
+          });
+          mostrar
         } else {
           flowDynamic(agendar)
         }

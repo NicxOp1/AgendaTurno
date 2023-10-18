@@ -296,7 +296,9 @@ export const verificarDisponibilidad = async (
         (horaFinSolicitada > horaInicioTurno && 
           horaFinSolicitada <= horaFinTurno) ||
         (horaInicioSolicitada < horaInicioTurno && 
-          horaFinSolicitada > horaFinTurno)
+          horaFinSolicitada > horaFinTurno) ||
+        (horaInicioTurno >= horaInicioSolicitada && 
+          horaInicioTurno < horaFinSolicitada)
       ) {
         // Hay solapamiento, no está disponible.
         console.log('Solapamiento detectado con el turno existente:', i);
@@ -312,6 +314,7 @@ export const verificarDisponibilidad = async (
     throw error;
   }
 };
+
 
 export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio) => {
   try {
@@ -473,13 +476,15 @@ export const buscarHorariosDisponibles = async (fecha, servicio) => {
       horaInicioJornada.setHours(horaInicioJornada.getHours() + duracionServicio);
     }
 
-    console.log('Horarios disponibles:', horariosDisponibles);
+   
     return horariosDisponibles;
   } catch (error) {
     console.error('Ocurrió un error al buscar los horarios disponibles:', error);
     throw error;
   }
 };
+
+
 
 
 
