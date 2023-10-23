@@ -36,18 +36,25 @@ function validarFecha(fechaStr) {
 const flowSelecion = bot
   .addKeyword("1",{ sensitive: true }) //Reservar un turno
   .addAnswer(
-    "Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/YY"
+    "Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/AA"
   )
   .addAction(
     { capture: true, delay: 2000 },
-    async (ctx, { state, fallBack, gotoFlow, flowDynamic }) => {
+    async (ctx, { state, gotoFlow, flowDynamic }) => {
       const resultado = validarFecha(ctx.body);
+      let error = 0;
       if (!resultado.valido) {
         flowDynamic(resultado.log);
+        error++
+        await state.update({ errorHandler: error });
+        const myState = state.getMyState();
+        if(myState.errorHandler>=3){
+          return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+        }
         return gotoFlow(flowSelecion);
       } else {
         await state.update({ dia: ctx.body });
-        return gotoFlow(flowBusqueda);
+        return await gotoFlow(flowBusqueda);
       }
     }
   )

@@ -9,8 +9,9 @@ const flowBusqueda = bot
     'B)💅Kapping con acrilico',
     'C)💅Kapping con gel',
     'D)💅Esmaltado Semi-permanente'],
-    {capture:true},
+    {capture:true, delay : 2000},
     async(ctx,{flowDynamic,state,gotoFlow})=>{
+        let error = 0
         if(ctx.body==='A'){
             const ServicioSeleccionado = 'Esculpidas'
             await state.update({ servicio: ServicioSeleccionado })
@@ -33,7 +34,13 @@ const flowBusqueda = bot
             flowDynamic()
         }else{
             flowDynamic ('Porfavor vuelve a intentarlo y selecciona una opcion valida')
-            await gotoFlow(flowBusqueda)
+            error++
+            await state.update({ errorHandler: error });
+            const myState = state.getMyState();
+            if(myState.errorHandler>=3){
+              return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+            }
+            return await gotoFlow(flowBusqueda)
         }
     })
 export default flowBusqueda

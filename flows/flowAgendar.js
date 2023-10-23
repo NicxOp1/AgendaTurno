@@ -1,5 +1,6 @@
 import bot from "@bot-whatsapp/bot";
-import { consultarTurnos, agendarTurno, buscarDiasDisponibles } from "../services/sheets/index.js";
+import { consultarTurnos, agendarTurno } from "../services/sheets/index.js";
+import flowReagendar from "./flowReagendar.js"
 
 function esHorarioValido(horario) {
   // Dividir la hora y los minutos
@@ -30,7 +31,7 @@ const flowAgendar = bot
 .addKeyword("bot")
 .addAnswer(
     "¿Cual es tu nombre?",
-    { capture: true },
+    { capture: true, delay : 2000 },
     async (ctx, { flowDynamic, state }) => {
       await state.update({ nombre: ctx.body });
       flowDynamic();
@@ -40,6 +41,7 @@ const flowAgendar = bot
     "Dime el horario que te gustaria el turno",
     { capture: true, delay : 2000 },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
+      let error = 0
       if (esHorarioValido(ctx.body)) {
         await state.update({ horario: ctx.body });
         await state.update({ telefono: ctx.from });
@@ -55,19 +57,32 @@ const flowAgendar = bot
         
         console.log('Resultado de agendarTurno:', agendar);
         if (agendar.Mensaje) {
-          flowDynamic(agendar.Mensaje)          
-          let mostrar=agendar.DiasDisponibles.forEach((dia) => {
-            dia.Horarios.forEach((horario) => {
-            return  flowDynamic(`\nPara el día ${dia.Fecha} hay un turno libre para las: ${horario} 
-                            \n Si alguno de estos horarios te sirve, responde con *Messirve*
-                            \n De lo contrario, responde con *Quiero el horario*`);
-            }); //falta resolver el tema de que muestre todos los horarios disponibles que sean posibles , dentro del dia que se mostro , solo llega el primero que seria a las 10:00 si es que no hay algo agendado
+          flowDynamic(agendar.Mensaje)           
+          let mostrar = agendar.DiasDisponibles.slice(0, 3).forEach((dia) => {
+            let lista = '';
+            for (let i = 0; i < dia.Horarios.length; i++) {
+              let hora = dia.Horarios[i];
+              lista += hora + (i % 3 === 2 ? '\n' : ' ');
+            }
+            let nuevoDia= dia.Fecha
+            let listadoDeHorarios= lista
+            flowDynamic(`Para el dia ${dia.Fecha} hay los siguientes turnos disponibles:\n\n${lista}`)
           });
+          await state.update({dia:dia.nuevoDia})
+          await state.update({horariosPosibles:listadoDeHorarios})
           mostrar
+          return await gotoFlow(flowReagendar)
         } else {
           flowDynamic(agendar)
+          return endFlow()
         }
       } else {
+        error++
+        await state.update({ errorHandler: error });
+        const myState = state.getMyState();
+        if(myState.errorHandler>=3){
+          return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+        }
         flowDynamic('Lo siento , escribiste mal el horario',
                     'recorda que solo aceptamos turnos de 10:00 a 18:30',
                     "Solo pueden intervalos de 30'")

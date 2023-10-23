@@ -271,34 +271,41 @@ export const verificarDisponibilidad = async (
     console.log('Turnos por día y servicio obtenidos:', turnosPorDiaYServicio);
 
     // 2. Obtener la duración del servicio solicitado.
-    const duracionServicio = turnosPorDiaYServicio["Duración"];
+    const duracionServicio = moment.duration(turnosPorDiaYServicio["Duración"]);
     console.log('Duración del servicio:', duracionServicio);
 
     // 3. Verificar disponibilidad en la hora solicitada.
     // Calcula el intervalo de tiempo ocupado por el servicio solicitado.
-    const horaInicioSolicitada = new Date(`01/01/2000 ${horaSolicitada}`);
-    const horaFinSolicitada = new Date(horaInicioSolicitada);
-    horaFinSolicitada.setHours(horaFinSolicitada.getHours() + duracionServicio);
+    const horaInicioSolicitada = moment(horaSolicitada, "HH:mm");
+    const horaFinSolicitada = moment(horaInicioSolicitada).add(duracionServicio);
+
+    // Verifica si la hora de inicio del turno solicitado es antes de las 10:00.
+    if (horaInicioSolicitada.isBefore(moment('10:00', 'HH:mm'))) {
+      console.log('El turno solicitado es demasiado temprano. Los turnos pueden comenzar a las 10:00 como muy temprano.');
+      return false;
+    }
+
+    // Verifica si la hora de finalización del turno solicitado excede el horario laboral.
+    if (horaFinSolicitada.isAfter(moment('20:00', 'HH:mm'))) {
+      console.log('El turno solicitado termina después del horario laboral. Los turnos deben terminar a las 20:00 como muy tarde.');
+      return false;
+    }
 
     // Comprueba si hay algún solapamiento con los turnos existentes.
     for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
-      const horaInicioTurno = new Date(
-        `01/01/2000 ${turnosPorDiaYServicio["Inicio"][i]}`
-      );
-      const horaFinTurno = new Date(
-        `01/01/2000 ${turnosPorDiaYServicio["Finalizacion"][i]}`
-      );
+      const horaInicioTurno = moment(turnosPorDiaYServicio["Inicio"][i], "HH:mm");
+      const horaFinTurno = moment(turnosPorDiaYServicio["Finalizacion"][i], "HH:mm");
 
       // Verifica si hay solapamiento de horarios.
       if (
-        (horaInicioSolicitada >= horaInicioTurno &&
-          horaInicioSolicitada < horaFinTurno) ||
-        (horaFinSolicitada > horaInicioTurno && 
-          horaFinSolicitada <= horaFinTurno) ||
-        (horaInicioSolicitada < horaInicioTurno && 
-          horaFinSolicitada > horaFinTurno) ||
-        (horaInicioTurno >= horaInicioSolicitada && 
-          horaInicioTurno < horaFinSolicitada)
+        (horaInicioSolicitada.isSameOrAfter(horaInicioTurno) &&
+          horaInicioSolicitada.isBefore(horaFinTurno)) ||
+        (horaFinSolicitada.isAfter(horaInicioTurno) && 
+          horaFinSolicitada.isSameOrBefore(horaFinTurno)) ||
+        (horaInicioSolicitada.isBefore(horaInicioTurno) && 
+          horaFinSolicitada.isAfter(horaFinTurno)) ||
+        (horaInicioSolicitada.isSameOrAfter(horaInicioTurno) && 
+          horaFinSolicitada.isAfter(horaFinTurno))
       ) {
         // Hay solapamiento, no está disponible.
         console.log('Solapamiento detectado con el turno existente:', i);
@@ -315,6 +322,86 @@ export const verificarDisponibilidad = async (
   }
 };
 
+export const buscarHorariosDisponibles = async (fecha, servicio) => {
+  try {
+    const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fecha, servicio);
+    const duracionServicio = parseInt(turnosPorDiaYServicio["Duración"].split(":")[0]);
+    let horariosDisponibles = [];
+    let horaInicioJornada = moment('10:00', 'HH:mm');
+    const horaFinJornada = moment('20:00', 'HH:mm');
+
+    while (horaInicioJornada.isSameOrBefore(horaFinJornada)) {
+      let disponible = true;
+      const horaFinSolicitada = moment(horaInicioJornada).add(duracionServicio, 'hours');
+
+      if (horaFinSolicitada.isAfter(horaFinJornada)) {
+        break;
+      }
+
+      for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
+        const horaInicioTurno = moment(turnosPorDiaYServicio["Inicio"][i], 'HH:mm');
+        const horaFinTurno = moment(turnosPorDiaYServicio["Finalizacion"][i], 'HH:mm');
+
+        if ((horaInicioJornada.isSameOrAfter(horaInicioTurno) && horaInicioJornada.isBefore(horaFinTurno)) ||
+            (horaFinSolicitada.isAfter(horaInicioTurno) && horaFinSolicitada.isSameOrBefore(horaFinTurno)) ||
+            (horaInicioJornada.isBefore(horaInicioTurno) && horaFinSolicitada.isAfter(horaFinTurno))) {
+          disponible = false;
+          break;
+        }
+      }
+
+      if (disponible) {
+        horariosDisponibles.push(horaInicioJornada.format('HH:mm'));
+      }
+
+      // Incrementar la hora de inicio en incrementos de 30 minutos.
+      horaInicioJornada.add(30, 'minutes');
+    }
+
+    return horariosDisponibles;
+  } catch (error) {
+    console.error('Ocurrió un error al buscar los horarios disponibles:', error);
+    throw error;
+  }
+};
+
+export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio) => {
+  try {
+    // Convierte la fecha de inicio al formato de Moment.js.
+    let fecha = moment(fechaInicio, 'DD/MM/YY').add(1, 'days');
+
+    // Verifica la disponibilidad para los próximos 3 días.
+    for (let i = 0; i < 3; i++) {
+      // Verifica si el día es entre martes y sábado.
+      if (fecha.day() >= 2 && fecha.day() <= 6) {
+        // Busca los horarios disponibles para este día.
+        const horariosDisponibles = await buscarHorariosDisponibles(fecha.format('DD/MM/YY'), servicio);
+        
+        if (horariosDisponibles.length > 0) {
+          return {
+            Fecha: fecha.format('DD/MM/YY'),
+            Horarios: horariosDisponibles
+          };
+        }
+      }
+
+      // Avanza al siguiente día.
+      fecha.add(1, 'days');
+    }
+
+    // Si no se encontró ningún día disponible en los próximos 3 días, devuelve un mensaje indicando esto.
+    return {
+      Mensaje: 'No se encontraron días disponibles en los próximos 3 días.'
+    };
+  } catch (error) {
+    // Maneja cualquier error que pueda haber ocurrido.
+    console.error(error);
+    return {
+      Mensaje: 'Ocurrió un error al buscar los próximos días y horarios disponibles.'
+    };
+  }
+}
+
 
 export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio) => {
   try {
@@ -329,25 +416,21 @@ export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, serv
         HorariosDisponibles: []
       };
     } else {
-      // Si el horario solicitado no está disponible, busca los horarios disponibles.
-      const horariosDisponibles = await buscarHorariosDisponibles(fecha, servicio);
-      console.log('Horarios disponibles:', horariosDisponibles);
+      // Si el horario solicitado no está disponible, busca el próximo día disponible y sus horarios.
+      const proximoDiaYHorarios = await buscarProximoDiaYHorariosDisponibles(servicio,fecha);
+      console.log('Próximo día y horarios disponibles:', proximoDiaYHorarios);
 
-      if (horariosDisponibles.length === 0) {
-        // Si no hay horarios disponibles, busca el próximo día disponible y sus horarios.
-        const diasDisponibles = await buscarDiasDisponibles(servicio);
-        console.log('Días disponibles:', diasDisponibles);
-
+      if (proximoDiaYHorarios.Mensaje) {
+        // Si no se encontró ningún día disponible en los próximos 7 días, devuelve un mensaje indicando esto.
         return {
           HorarioAprobado: false,
-          Mensaje: 'Lo siento, no encontramos disponibilidad para este día.',
-          DiasDisponibles: diasDisponibles
+          Mensaje: proximoDiaYHorarios.Mensaje
         };
       }
 
       return {
         HorarioAprobado: false,
-        HorariosDisponibles: horariosDisponibles
+        DiasDisponibles: [proximoDiaYHorarios]
       };
     }
   } catch (error) {
@@ -356,133 +439,24 @@ export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, serv
   }
 };
 
-export const buscarDiasDisponibles = async (servicio) => {
-  try {
-    const CREDENTIALS = {
-      type: "service_account",
-      project_id: "calendar-turnos-400220",
-      private_key_id: "0b3dea17024160a280f1a7cee89ccca4686e4f22",
-      private_key:
-        "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCUhRTHyLORDs3u\nghO1F6K7ewDoZ7S18ZzcWvJGr5aR0KihyjAaMnbRNlX/5WLR7erSNx1ycWoNqY45\n+HKKQb1QQW3mvmjQ69SiL/nO7sox+wOg+eHbkHZtQyZVLQ9hP3bqUlIAkXIiJYKB\nUe7OIqA2WWJBRR0oK3a8aIZ3sJ537MvTznq40qGezHBcOUbpFwoCne7hZSzKKWT+\nHHonR0F5hVXg7On+Rd3foFtK2F7Dfgc4hpAmOC0fr4F0gq7RWl307oPK+DluKEBF\nAM8aBv0vk2+DKzqRwGwaBTVANBk5TPWBUUV+ObcAu4by6im02VBj6rf9jcELB29h\nBOl+iQ8dAgMBAAECggEAA2TUtnIHHAUI0sZ695kIK+BvdbD0/YvpLrOVpw0tWnlM\noZ9Q5D3V+YK19gUq60YRGZAVwYXeoxjrW98V5KkR3UlXysQyBwiWQ7fnTz5Uk58F\nXpo2XzDzyVIVo2ZGVZ5vrRbYv940rWXeuCP2qxQERemrqyY2+/WChATjI9sZ3ngH\nNuTJagoP2dyit9//WqKMK3atLNbMC0/aaDhBcGBF3GUb3gbngM8m2ITKYQCpkfX3\nP9PCSX2vDVrhNIO9nVFWn/iEWhOB/8wl3hhHeexlxzdPNLGZgSr2ZVn3ZcsRs3r2\nagEUVnVUv03sUVQ0MiFScl1GOsy8EWO3K6pQcvO1owKBgQDMVyJTVQPWWRCMkaYX\noq3cxf6Ycn/4qFOF8pfJGaVncz7NZk1WHtCYX4pYgMZczI8hcKi7ZXNWIDO29wah\nFV9gLg+7jCXrFt0bsEeU4lUHa2S8/BhYUN6i0Y7SlzUbpP5LIXQ/jubGsSEfSZU3\nIWL3ghUMCsCemeBZoBuKQXRofwKBgQC6EUE26qf8rGhuPK9p3LgzwMtCRe22TCo/\nGb735zcwmWWMwHNidRSIn5sDz1Jpl2Tx5hp6IoLF+CiGLWnEnbyXFpkp5PnskwjE\nhDLDJWBv1pfKARlxz3prfvv1hlrgQ4POJ++NWmASBp+Q9Eolq5tQwxz7fXrZiZyP\nRqbkmjhaYwKBgCN9BpMecropYbxoF0aHlFaBdIQZbqxK36alyUK914It+7xEhi3s\n0CGGhkp0ov6+8CTIoiVZqzxL/29JW7diNNxJY6YY4wT/RYtnhCcRX98YAbjot3mv\nIdt5NarRZAHXF+sIdl4LfX0Iik4aw3V9sOh3iRw8SdPBubsXGXFbiNIVAoGBAJGc\nJTPryRC0f3kdZozq3QArNSWlAdUyn7EH3em0+PzAXrcaeHGpfCs69B20JiNaBfZE\nA55m2X5BqLzwVyA17Ls0RSKC/Y7EtgzMA8mxu1lqTxkXaSkmm//5vQW0YfO1AjXY\nDODKw/n3UvImKsx2EjLOriSlWvlYdrutJ7godEdPAoGBAKLT/pqhlk96TUMoONhB\nIcrTQy1x4VVWZhx3MaVJKDhz6TvcmWBX6Fev0f5060PusKrKrVaCo4/mgWc20bit\niJ3NGdXKRxIoi54tdTOIf35UobN+bVfUVy1uRGN3PZEaFgTUIJVsKEdI8Pn07eQI\nNy3/BcKkTIJ4rWnMH5nWEjJl\n-----END PRIVATE KEY-----\n",
-      client_email: "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
-      client_id: "107884470593691798095",
-      auth_uri: "https://accounts.google.com/o/oauth2/auth",
-      token_uri: "https://oauth2.googleapis.com/token",
-      auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-      client_x509_cert_url:
-        "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
-      universe_domain: "googleapis.com",
-    };
-    // Carga la hoja 1.
-    await doc.useServiceAccountAuth(CREDENTIALS);
-    await doc.loadInfo();
-    let sheet = doc.sheetsByTitle["Hoja 1"];
-    let rows = await sheet.getRows();
 
-    // Crea un conjunto para almacenar las fechas de los turnos ocupados.
-    let fechasOcupadas = new Set();
-
-    // Itera sobre las filas para obtener las fechas de los turnos ocupados.
-    for (let row of rows) {
-      if (row._rawData[3] === servicio) { // Asume que el servicio está en la cuarta columna (índice 3).
-        fechasOcupadas.add(row._rawData[0]); // Asume que la fecha está en la primera columna (índice 0).
-      }
-    }
-
-    // Obtén la fecha actual.
-    const hoy = new Date();
-
-    // Crea un array para almacenar los días disponibles.
-    let diasDisponibles = [];
-
-    // Verifica la disponibilidad para los próximos 7 días.
-    for (let i = 1; i < 7; i++) {
-      // Calcula la fecha del día que estás verificando.
-      let fecha = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + i);
-
-      // Verifica si el día es entre martes y sábado.
-      if (fecha.getDay() >= 2 && fecha.getDay() <= 6) {
-        // Formatea la fecha al formato que tu función necesita (por ejemplo, 'DD/MM/YY').
-        let fechaFormateada = `${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear().toString().substr(-2)}`;
-
-        // Si esta fecha no está en el conjunto de fechas ocupadas, entonces está disponible.
-        if (!fechasOcupadas.has(fechaFormateada)) {
-          // Busca los horarios disponibles para este día.
-          const horariosDisponibles = await buscarHorariosDisponibles(fechaFormateada, servicio);
-          
-          if (horariosDisponibles.length > 0) {
-            diasDisponibles.push({
-              Fecha: fechaFormateada,
-              Horarios: horariosDisponibles
-            });
-          }
-        }
-      }
-      
-      // Si ya encontraste un día disponible, no necesitas buscar más.
-      if (diasDisponibles.length > 0) {
-        break;
-      }
-    }
-
-    console.log('Días disponibles:', diasDisponibles);
-    return diasDisponibles;
-  } catch (error) {
-    console.error('Ocurrió un error al buscar los días disponibles:', error);
-    throw error;
-  }
+/* 
+const CREDENTIALS = {
+  type: "service_account",
+  project_id: "calendar-turnos-400220",
+  private_key_id: "0b3dea17024160a280f1a7cee89ccca4686e4f22",
+  private_key:
+    "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCUhRTHyLORDs3u\nghO1F6K7ewDoZ7S18ZzcWvJGr5aR0KihyjAaMnbRNlX/5WLR7erSNx1ycWoNqY45\n+HKKQb1QQW3mvmjQ69SiL/nO7sox+wOg+eHbkHZtQyZVLQ9hP3bqUlIAkXIiJYKB\nUe7OIqA2WWJBRR0oK3a8aIZ3sJ537MvTznq40qGezHBcOUbpFwoCne7hZSzKKWT+\nHHonR0F5hVXg7On+Rd3foFtK2F7Dfgc4hpAmOC0fr4F0gq7RWl307oPK+DluKEBF\nAM8aBv0vk2+DKzqRwGwaBTVANBk5TPWBUUV+ObcAu4by6im02VBj6rf9jcELB29h\nBOl+iQ8dAgMBAAECggEAA2TUtnIHHAUI0sZ695kIK+BvdbD0/YvpLrOVpw0tWnlM\noZ9Q5D3V+YK19gUq60YRGZAVwYXeoxjrW98V5KkR3UlXysQyBwiWQ7fnTz5Uk58F\nXpo2XzDzyVIVo2ZGVZ5vrRbYv940rWXeuCP2qxQERemrqyY2+/WChATjI9sZ3ngH\nNuTJagoP2dyit9//WqKMK3atLNbMC0/aaDhBcGBF3GUb3gbngM8m2ITKYQCpkfX3\nP9PCSX2vDVrhNIO9nVFWn/iEWhOB/8wl3hhHeexlxzdPNLGZgSr2ZVn3ZcsRs3r2\nagEUVnVUv03sUVQ0MiFScl1GOsy8EWO3K6pQcvO1owKBgQDMVyJTVQPWWRCMkaYX\noq3cxf6Ycn/4qFOF8pfJGaVncz7NZk1WHtCYX4pYgMZczI8hcKi7ZXNWIDO29wah\nFV9gLg+7jCXrFt0bsEeU4lUHa2S8/BhYUN6i0Y7SlzUbpP5LIXQ/jubGsSEfSZU3\nIWL3ghUMCsCemeBZoBuKQXRofwKBgQC6EUE26qf8rGhuPK9p3LgzwMtCRe22TCo/\nGb735zcwmWWMwHNidRSIn5sDz1Jpl2Tx5hp6IoLF+CiGLWnEnbyXFpkp5PnskwjE\nhDLDJWBv1pfKARlxz3prfvv1hlrgQ4POJ++NWmASBp+Q9Eolq5tQwxz7fXrZiZyP\nRqbkmjhaYwKBgCN9BpMecropYbxoF0aHlFaBdIQZbqxK36alyUK914It+7xEhi3s\n0CGGhkp0ov6+8CTIoiVZqzxL/29JW7diNNxJY6YY4wT/RYtnhCcRX98YAbjot3mv\nIdt5NarRZAHXF+sIdl4LfX0Iik4aw3V9sOh3iRw8SdPBubsXGXFbiNIVAoGBAJGc\nJTPryRC0f3kdZozq3QArNSWlAdUyn7EH3em0+PzAXrcaeHGpfCs69B20JiNaBfZE\nA55m2X5BqLzwVyA17Ls0RSKC/Y7EtgzMA8mxu1lqTxkXaSkmm//5vQW0YfO1AjXY\nDODKw/n3UvImKsx2EjLOriSlWvlYdrutJ7godEdPAoGBAKLT/pqhlk96TUMoONhB\nIcrTQy1x4VVWZhx3MaVJKDhz6TvcmWBX6Fev0f5060PusKrKrVaCo4/mgWc20bit\niJ3NGdXKRxIoi54tdTOIf35UobN+bVfUVy1uRGN3PZEaFgTUIJVsKEdI8Pn07eQI\nNy3/BcKkTIJ4rWnMH5nWEjJl\n-----END PRIVATE KEY-----\n",
+  client_email: "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+  client_id: "107884470593691798095",
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url:
+    "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+  universe_domain: "googleapis.com",
 };
-
-export const buscarHorariosDisponibles = async (fecha, servicio) => {
-  try {
-    // 1. Obtener todos los turnos para la fecha dada.
-    const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fecha, servicio);
-
-    // 2. Obtener la duración del servicio solicitado.
-    const duracionServicio = turnosPorDiaYServicio["Duración"];
-
-    // 3. Crear una lista de horarios disponibles.
-    let horariosDisponibles = [];
-
-    // 4. Definir el horario de trabajo
-    let horaInicioJornada = new Date(`01/01/2000 10:00`);
-    const horaFinJornada = new Date(`01/01/2000 20:00`);
-
-    while (horaInicioJornada <= horaFinJornada) {
-      let disponible = true;
-      const horaFinSolicitada = new Date(horaInicioJornada);
-      horaFinSolicitada.setHours(horaFinSolicitada.getHours() + duracionServicio);
-
-      if (horaFinSolicitada > horaFinJornada) {
-        break;
-      }
-
-      for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
-        const horaInicioTurno = new Date(`01/01/2000 ${turnosPorDiaYServicio["Inicio"][i]}`);
-        const horaFinTurno = new Date(`01/01/2000 ${turnosPorDiaYServicio["Finalizacion"][i]}`);
-
-        if ((horaInicioJornada >= horaInicioTurno && horaInicioJornada < horaFinTurno) ||
-            (horaFinSolicitada > horaInicioTurno && horaFinSolicitada <= horaFinTurno)) {
-          disponible = false;
-          break;
-        }
-      }
-
-      if (disponible) {
-        horariosDisponibles.push(horaInicioJornada.toTimeString().substring(0,5));
-      }
-
-      // Incrementar la hora de inicio en incrementos de 'duracionServicio'.
-      horaInicioJornada.setHours(horaInicioJornada.getHours() + duracionServicio);
-    }
-
-   
-    return horariosDisponibles;
-  } catch (error) {
-    console.error('Ocurrió un error al buscar los horarios disponibles:', error);
-    throw error;
-  }
-};
+ */
 
 
 
@@ -496,5 +470,5 @@ export default {
   consultarTurnosPorDiaYServicio,
   verificarYBuscarDisponibilidad,
   buscarHorariosDisponibles,
-  buscarDiasDisponibles,
+  buscarProximoDiaYHorariosDisponibles
 };  
