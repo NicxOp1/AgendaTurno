@@ -8,16 +8,20 @@ import GoogleSheetService from "./services/sheets/index.js"; */
 import flowPrincipal from "./flows/flowBienvenida.js"
 import flowSelecion from "./flows/flowSeleccion.js";
 import flowBusqueda from "./flows/flowBusqueda.js";
-import flowAgendar from "./flows/flowAgendar.js";/* 
+import flowAgendar from "./flows/flowAgendar.js";
 import flowReagendar from "./flows/flowReagendar.js";
-import flowCambiarFecha from "./flows/flowCambiarFecha.js"; */
+import flowCambiarFecha from "./flows/flowCambiarFecha.js";
+/* 
+import flowCambiarFecha from "./flows/flowCambiarFecha.js";  */
 /* 
 const googelSheet = new GoogleSheetService(
   "1MFSLDq62rA7gHQtIuDAcFwm5R91yyKrECLelh7mPWnc"
 ); */
 
 const GLOBAL_STATE = [];
-
+export default function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 const main = async () => {
   const adapterDB = new MockAdapter();
   const adapterFlow = bot.createFlow([
@@ -25,9 +29,8 @@ const main = async () => {
     flowSelecion,
     flowBusqueda,
     flowAgendar,
-/* s */
-  /*   flowCambiarFecha, */
-
+    flowReagendar,
+    flowCambiarFecha,
   ]);
   const adapterProvider = bot.createProvider(BaileysProvider);
 

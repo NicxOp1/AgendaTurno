@@ -2,31 +2,38 @@ import bot from "@bot-whatsapp/bot";
 /* import pkg from '@bot-whatsapp/bot'; */
 import flowSelecion from "./flowSeleccion.js";
 /* const {EVENTS} = pkg;
- */
+*/
+let error = 0;
 const flowPrincipal = bot
   .addKeyword("hola")
-  .addAnswer(
-    `Hola ! te estas comunicando con
-    Bel´s Nails
-    \nPorfavor seleccione una opción para continuar
-    \n1)📅Reservar un turno
-    \n2)🤔Consultar o cambiar un turno
-    \n3)❌Cancelar un turno
-    \n4)🕔Ver turnos disponibles segun fecha
-    \n5)❓Preguntas frecuentes
-    \n💤Escribe *cancelar* para frenar la comunicación`,
+  .addAnswer(`🌼 ¡Hola! 🌼 
+Bienvenido a Bel's Nails.
+¿Cómo puedo ayudarte hoy? 
+Por favor,
+elige una opción para continuar:\n
+1)📅 *reservar un turno*\n
+2)🤔 *consultar o cambiar un turno*\n
+3)❌ *cancelar un turno*\n
+4)🕔 *ver turnos disponibles según la fecha*\n
+5)❓ *preguntas frecuentes*
+
+Si en algún momento deseas
+detener la comunicación,
+simplemente escribe *cancelar*. 
+¡Estoy aquí para ayudarte! 😊`,
     {capture:true, delay : 2000}, 
-    async (ctx,{state,gotoFlow,endFlow,flowDynamic})=> {
-      let error = 0;
-      if(ctx.body==1||2||3||4||5){
+    async (ctx,{state,gotoFlow,endFlow})=> {
+      console.log(ctx.body)
+      if(parseInt(ctx.body)>0&&parseInt(ctx.body)<6){
         await gotoFlow(flowSelecion)
-      }else if(ctx.body==cancelar){
-        return endFlow('Nos vemos pronto!, en caso de volver a encenderme escribe *hola*')
+      }
+      if(ctx.body.toLowerCase()=="cancelar"){
+        return endFlow({body:'Nos vemos pronto!, en caso de volver a encenderme escribe *hola*'})
       }else{
-        flowDynamic('Porfavor escribe una opcion valida')
-        error++
+        error++;
         await state.update({ errorHandler: error });
         const myState = state.getMyState();
+        console.log(myState.errorHandler)
         if(myState.errorHandler>=3){
           return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }

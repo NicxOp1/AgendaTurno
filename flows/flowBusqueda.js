@@ -1,6 +1,6 @@
 import bot from "@bot-whatsapp/bot";
 import flowAgendar from "./flowAgendar.js";
-
+let error = 0
 const flowBusqueda = bot
 .addKeyword('bot')
 .addAnswer(
@@ -11,7 +11,6 @@ const flowBusqueda = bot
     'D)💅Esmaltado Semi-permanente'],
     {capture:true, delay : 2000},
     async(ctx,{flowDynamic,state,gotoFlow})=>{
-        let error = 0
         if(ctx.body==='A'){
             const ServicioSeleccionado = 'Esculpidas'
             await state.update({ servicio: ServicioSeleccionado })

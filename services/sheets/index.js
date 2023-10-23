@@ -72,6 +72,8 @@ export const agendarTurno = async (
 ) => {
   try {
     // 1. Verificar si ya existe un turno con el mismo número de teléfono.
+    // o generar una funcion en el excel para que la fecha anterior al dia actual borre el turno o
+    //generar dentro de consultar turnos una funcion para que mire explicitamente los turnos del dia o de los dias siguientes 
     const turnosExistentes = await consultarTurnos(telefono);
     console.log('Turnos existentes:', turnosExistentes);
     if (turnosExistentes.length > 0) {
@@ -88,14 +90,12 @@ export const agendarTurno = async (
     console.log('Disponibilidad:', disponibilidad);
     if (!disponibilidad.HorarioAprobado) {
       console.log('El horario solicitado no está disponible.');
-      if (disponibilidad.DiasDisponibles && disponibilidad.DiasDisponibles.length > 0) {
+      if (disponibilidad.DiasDisponibles) {
         return {
           Mensaje: "El horario solicitado no está disponible. Aquí están los próximos días y horarios disponibles:",
           DiasDisponibles: disponibilidad.DiasDisponibles
         };
-      } else {
-        return "El horario solicitado no está disponible, por favor busca otro horario";
-      }
+      } 
     } else {
       console.log("Turno a punto de agendarse...");
       let devolucion = await agregarTurno(fecha, horaSolicitada, servicio, cliente, telefono);
@@ -183,7 +183,7 @@ export const agregarTurno = async (
 
     console.log('Turno agendado con éxito');
     
-    return "turno agendado con exito";
+    return `¡Perfecto! ${cliente}, tu turno ya fue agendado. Iniciará a las ${horaInicio} y finalizará a las ${horaFinalizacion}. ¡Gracias por elegirnos! 😊👍`;
   } catch (error) {
     console.error('Ocurrió un error al agregar el turno:', error);
     throw error;
@@ -430,7 +430,7 @@ export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, serv
 
       return {
         HorarioAprobado: false,
-        DiasDisponibles: [proximoDiaYHorarios]
+        DiasDisponibles: proximoDiaYHorarios
       };
     }
   } catch (error) {
