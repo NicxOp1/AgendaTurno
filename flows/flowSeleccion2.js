@@ -1,5 +1,5 @@
+//este es el 
 import bot from "@bot-whatsapp/bot";
-import flowBusqueda from "./flowBusqueda.js";
 import { consultarTurnos } from "../services/sheets/index.js";
 /* import pkg from '@bot-whatsapp/bot';
 const {EVENTS} = pkg; */
@@ -42,35 +42,36 @@ function validarFecha(fechaStr) {
 
   return { valido: true, log: "Fecha válida." };
 }
-
-const flowSelecion1 = bot
-  .addKeyword("1",{ sensitive: true }) //Reservar un turno
-  .addAnswer(
-    "Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/AA",
-    "Recuerda siempre que quieras *Cancelar*",
-  )
-  .addAction(
-    { capture: true, delay: 2000 },
-    async (ctx, { state, gotoFlow, flowDynamic }) => {
-      const resultado = validarFecha(ctx.body);
-      
-      if (!resultado.valido) {
-        error++
-        flowDynamic(resultado.log);
-        /* console.log(`CANTIDAD DE ERRORES ✖✖➖➖✖✖➖✖✖ ${error}`) */
-        await state.update({ errorHandler: error });
-        const myState = state.getMyState();
-        if(myState.errorHandler>=3){
-          return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-        }
-        return gotoFlow(flowSelecion1);
-      } else {
-        await state.update({ dia: ctx.body });
-        return await gotoFlow(flowBusqueda);
+const flowSelecion2 = bot
+.addKeyword("2",{ sensitive: true })
+.addAnswer(
+   `Perfecto aquí se encuentran tus turnos ya agendados..
+  Recuerda siempre que quieras *Cancelar*`
+)
+.addAction(
+  {delay: 2000 },
+  async (ctx, { state, gotoFlow, flowDynamic }) => {
+    const myState = state.getMyState();
+    console.log(myState.telefono)
+    let consulta = consultarTurnos(myState.telefono)
+    console.log("Turnos consultados ✖✖➖➖✖✖➖✖✖ ",consulta)
+    return consulta['Fecha']
+  /*   const resultado = validarFecha(ctx.body); */
+    /* 
+    if (!resultado.valido) {
+      error++
+      flowDynamic(resultado.log);
+       console.log(`CANTIDAD DE ERRORES ✖✖➖➖✖✖➖✖✖ ${error}`) 
+      await state.update({ errorHandler: error });
+      const myState = state.getMyState();
+      if(myState.errorHandler>=3){
+        return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
       }
-    }
-  )
-
-
-export default flowSelecion1
-
+      return gotoFlow(flowSelecion);
+    } else {
+      await state.update({ dia: ctx.body });
+      return await gotoFlow(flowBusqueda);
+    } */
+  }
+)
+export default flowSelecion2

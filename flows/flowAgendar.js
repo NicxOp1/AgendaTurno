@@ -29,15 +29,15 @@ function esHorarioValido(horario) {
 let nuevoDia = 0
 let listadoDeHorarios= 0
 const flowAgendar = bot
-.addKeyword("pene")
+.addKeyword("bot")
 .addAnswer(
     "¿Cual es tu nombre?",
     { capture: true, delay : 2000 },
     async (ctx, { flowDynamic, state }) => {
       console.log(ctx.body)
       await state.update({ nombre: ctx.body });
-      await state.update({ servicio: "Esculpidas" });
-      await state.update({ dia: "25/10/23" });
+/* testing      await state.update({ servicio: "Esculpidas" });
+      await state.update({ dia: "25/10/23" }); */
       flowDynamic();
     }
 )
@@ -47,7 +47,7 @@ const flowAgendar = bot
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
       let error = 0
       if (esHorarioValido(ctx.body)) {
-        await state.update({ horario: "12:00" });
+        await state.update({ horario: ctx.body }); 
         await state.update({ telefono: ctx.from });
         const myState = state.getMyState();
         console.log(myState.horario);
