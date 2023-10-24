@@ -3,14 +3,15 @@ import bot from "@bot-whatsapp/bot";
 import QRPortalWeb from "@bot-whatsapp/portal";
 import BaileysProvider from "@bot-whatsapp/provider/baileys";
 import MockAdapter from "@bot-whatsapp/database/mock";
-/* import chatgpt from "./services/openai/chatgpt.js";
-import GoogleSheetService from "./services/sheets/index.js"; */
 import flowPrincipal from "./flows/flowBienvenida.js"
-import flowSelecion from "./flows/flowSeleccion.js";
+import flowSelecion1 from "./flows/flowSeleccion.js";
+import flowSelecion2 from "./flows/flowSeleccion2.js"
 import flowBusqueda from "./flows/flowBusqueda.js";
 import flowAgendar from "./flows/flowAgendar.js";
 import flowReagendar from "./flows/flowReagendar.js";
 import flowCambiarFecha from "./flows/flowCambiarFecha.js";
+/* import chatgpt from "./services/openai/chatgpt.js";
+import GoogleSheetService from "./services/sheets/index.js"; */
 /* 
 import flowCambiarFecha from "./flows/flowCambiarFecha.js";  */
 /* 
@@ -26,7 +27,8 @@ const main = async () => {
   const adapterDB = new MockAdapter();
   const adapterFlow = bot.createFlow([
     flowPrincipal,
-    flowSelecion,
+    flowSelecion1,
+    flowSelecion2,
     flowBusqueda,
     flowAgendar,
     flowReagendar,
@@ -39,7 +41,6 @@ const main = async () => {
     provider: adapterProvider,
     database: adapterDB,
   });
-
   QRPortalWeb();
 };
 

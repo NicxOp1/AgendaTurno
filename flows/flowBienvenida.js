@@ -1,6 +1,10 @@
 import bot from "@bot-whatsapp/bot";
 /* import pkg from '@bot-whatsapp/bot'; */
-import flowSelecion from "./flowSeleccion.js";
+import flowSelecion1 from "./flowSeleccion.js";
+import flowSeleccion2 from "./flowSeleccion2.js";
+/* import flowSeleccion3 from "./flowSeleccion3.js";
+import flowSeleccion4 from "./flowSeleccion4.js";
+import flowSeleccion5 from "./flowSeleccion5.js"; */
 /* const {EVENTS} = pkg;
 */
 let error = 0;
@@ -23,10 +27,20 @@ simplemente escribe *cancelar*.
 ¡Estoy aquí para ayudarte! 😊`,
     {capture:true, delay : 2000}, 
     async (ctx,{state,gotoFlow,endFlow})=> {
-      console.log(ctx.body)
-      if(parseInt(ctx.body)>0&&parseInt(ctx.body)<6){
-        await gotoFlow(flowSelecion)
-      }
+      console.log("datosss",ctx.body)
+      await state.update({ telefono: ctx.from });
+      if(parseInt(ctx.body)==1){
+        await gotoFlow(flowSelecion1)
+      }else if(parseInt(ctx.body)==2){
+        console.log("entro en consultar o cambiar")
+        await gotoFlow(flowSeleccion2)
+      }/* else if(parseInt(ctx.body)==3){
+        await gotoFlow(flowSeleccion3)
+      }else if(parseInt(ctx.body)==4){
+        await gotoFlow(flowSeleccion4)
+      }else if(parseInt(ctx.body)==5){
+        await gotoFlow(flowSeleccion5)
+      } */
       if(ctx.body.toLowerCase()=="cancelar"){
         return endFlow({body:'Nos vemos pronto!, en caso de volver a encenderme escribe *hola*'})
       }else{

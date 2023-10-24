@@ -1,6 +1,6 @@
 import bot from "@bot-whatsapp/bot";
 import { agendarTurno } from "../services/sheets/index.js";
-import flowSelecion from "./flowSeleccion.js";
+import flowSelecion1 from "./flowSeleccion.js";
  
 let error = 0
 const errorMessages = {
@@ -60,7 +60,7 @@ Recordá el formato DD/MM/AA`,
               if(myState.errorHandler>=3){
                 return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
               }
-              return await gotoFlow(flowSelecion); 
+              return await gotoFlow(flowSelecion1); 
             } else {
               await state.update({ dia: ctx.body });
               const myState = state.getMyState();

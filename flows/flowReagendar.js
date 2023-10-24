@@ -8,7 +8,6 @@ const flowReagendar = bot
          { capture: true, delay : 2000 },
          async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
             const myState = state.getMyState();
-            console.log('llegoooooo')
             if(myState.horariosPosibles.includes(ctx.body)){
                 flowDynamic("Perfecto, estamos procesando los datos...")
                 await state.update({horario:ctx.body})
