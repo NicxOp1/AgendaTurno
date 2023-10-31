@@ -2,8 +2,8 @@ import bot from "@bot-whatsapp/bot";
 /* import pkg from '@bot-whatsapp/bot'; */
 import flowSelecion1 from "./flowSeleccion.js";
 import flowSeleccion2 from "./flowSeleccion2.js";
-/* import flowSeleccion3 from "./flowSeleccion3.js";
-import flowSeleccion4 from "./flowSeleccion4.js";
+import flowSeleccion3 from "./flowSeleccion3.js";
+/*import flowSeleccion4 from "./flowSeleccion4.js";
 import flowSeleccion5 from "./flowSeleccion5.js"; */
 /* const {EVENTS} = pkg;
 */
@@ -34,9 +34,9 @@ simplemente escribe *cancelar*.
       }else if(parseInt(ctx.body)==2){
         console.log("entro en consultar o cambiar")
         await gotoFlow(flowSeleccion2)
-      }/* else if(parseInt(ctx.body)==3){
+      } else if(parseInt(ctx.body)==3){
         await gotoFlow(flowSeleccion3)
-      }else if(parseInt(ctx.body)==4){
+      }/*else if(parseInt(ctx.body)==4){
         await gotoFlow(flowSeleccion4)
       }else if(parseInt(ctx.body)==5){
         await gotoFlow(flowSeleccion5)
