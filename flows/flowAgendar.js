@@ -31,18 +31,8 @@ let listadoDeHorarios= 0
 const flowAgendar = bot
 .addKeyword("bot")
 .addAnswer(
-    "¿Cual es tu nombre?",
-    { capture: true, delay : 2000 },
-    async (ctx, { flowDynamic, state }) => {
-      console.log(ctx.body)
-      await state.update({ nombre: ctx.body });
-/* testing      await state.update({ servicio: "Esculpidas" });
-      await state.update({ dia: "25/10/23" }); */
-      flowDynamic();
-    }
-)
-.addAnswer(
-    "Dime el horario que te gustaria el turno",
+  `Dime el horario que te gustaria el turno
+  Recuerda el formato HH:MM ej: 13:30⏱`,
     { capture: true, delay : 2000 },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
       let error = 0
@@ -88,9 +78,11 @@ const flowAgendar = bot
         if(myState.errorHandler>=3){
           return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }
-        flowDynamic('Lo siento , escribiste mal el horario',
-                    'recorda que solo aceptamos turnos de 10:00 a 18:30',
-                    "Solo pueden intervalos de 30'")
+        flowDynamic(`Lo siento😥 , escribiste mal el horario\n
+recorda que solo aceptamos turnos de 10:00 a 18:30\n
+Solo pueden intervalos de 30'👀\n
+El formato es *hh/mm* ej: *13:00*⌚`)
+        await delay(2000)
                     return await gotoFlow(flowAgendar)
                   }
       }

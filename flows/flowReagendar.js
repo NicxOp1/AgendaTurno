@@ -1,6 +1,7 @@
 import bot from "@bot-whatsapp/bot";
 import { agendarTurno } from "../services/sheets/index.js";
 import flowCambiarFecha from "./flowCambiarFecha.js";
+import { cleanMessage } from "@whiskeysockets/baileys";
 
 function esHorarioValido(horario) {
   // Dividir la hora y los minutos
@@ -33,15 +34,16 @@ const flowReagendar = bot
 .addAnswer(`Porfavor ingresá explicitamente el horario que te gustaria tomar. Si queres cambiar el dia escribe *Cambiar*`,
          { capture: true, delay : 2000 },
          async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
+          console.log("EL HORARIO DEL TURNO A CAMBIAR: " + ctx.body)
            const myState = state.getMyState();
           if(myState.horariosPosibles){
-            if(myState.horariosPosibles.includes(ctx.body)){              
+            if(myState.horariosPosibles.includes(ctx.body)){               
               flowDynamic("Perfecto, estamos procesando los datos...")
               await state.update({horario:ctx.body})
-              console.log(myState)
+              console.log("ES HORARIO POSIBLE"+ctx.body)
               const agendar = await agendarTurno(
                   myState.dia,
-                  myState.horario,
+                  ctx.body,
                   myState.servicio,
                   myState.nombre,
                   myState.telefono,
@@ -53,10 +55,10 @@ const flowReagendar = bot
             if(esHorarioValido(ctx.body)){
                 flowDynamic("Perfecto, estamos procesando los datos...")
                 await state.update({horario:ctx.body})
-                console.log(myState)
+                console.log("ES HORARIO VALIDO: " + ctx.body)
                 const agendar = await agendarTurno(
                     myState.dia,
-                    myState.horario,
+                    ctx.body,
                     myState.servicio,
                     myState.nombre,
                     myState.telefono,

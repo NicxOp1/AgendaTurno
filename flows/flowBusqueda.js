@@ -1,5 +1,6 @@
 import bot from "@bot-whatsapp/bot";
 import flowAgendar from "./flowAgendar.js";
+import delay from "../app.js";
 let error = 0
 const flowBusqueda = bot
 .addKeyword('bot')
@@ -32,7 +33,8 @@ const flowBusqueda = bot
             await gotoFlow(flowAgendar)
             flowDynamic()
         }else{
-            flowDynamic ('Porfavor vuelve a intentarlo y selecciona una opcion valida')
+            await delay(2000)
+            await flowDynamic ('Porfavor vuelve a intentarlo y selecciona una opcion valida')
             error++
             await state.update({ errorHandler: error });
             const myState = state.getMyState();

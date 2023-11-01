@@ -11,23 +11,23 @@ let error = 0;
 const flowPrincipal = bot
   .addKeyword("hola")
   .addAnswer(`🌼 ¡Hola! 🌼 
-Bienvenido a Bel's Nails.
+Bienvenido a Bel's Nails💅
 ¿Cómo puedo ayudarte hoy? 
 Por favor,
 elige una opción para continuar:\n
-1)📅 *reservar un turno*\n
-2)🤔 *consultar o cambiar un turno*\n
-3)❌ *cancelar un turno*\n
-4)🕔 *ver turnos disponibles según la fecha*\n
-5)❓ *preguntas frecuentes*
+1️⃣📅 *reservar un turno*\n
+2️⃣🤔 *consultar o cambiar un turno*\n
+3️⃣❌ *cancelar un turno*\n
+4️⃣🕔 *ver turnos disponibles según la fecha*\n
+5️⃣❓ *preguntas frecuentes*
 
 Si en algún momento deseas
 detener la comunicación,
 simplemente escribe *cancelar*. 
 ¡Estoy aquí para ayudarte! 😊`,
     {capture:true, delay : 2000}, 
-    async (ctx,{state,gotoFlow,endFlow})=> {
-      console.log("datosss",ctx.body)
+    async (ctx,{state,gotoFlow,endFlow,flowDynamic})=> {
+      console.log("ctx del flow Bienvenida:",ctx.body)
       await state.update({ telefono: ctx.from });
       if(parseInt(ctx.body)==1){
         await gotoFlow(flowSelecion1)
@@ -44,6 +44,7 @@ simplemente escribe *cancelar*.
       if(ctx.body.toLowerCase()=="cancelar"){
         return endFlow({body:'Nos vemos pronto!, en caso de volver a encenderme escribe *hola*'})
       }else{
+        await flowDynamic("Lo lamento, te has equivocado con el numero ingresado")
         error++;
         await state.update({ errorHandler: error });
         const myState = state.getMyState();

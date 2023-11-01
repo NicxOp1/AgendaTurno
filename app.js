@@ -15,6 +15,7 @@ import flowSeleccionarTurno from "./flows/flowSeleccionarTurno.js";
 import flowConfirmarCancelacion from "./flows/flowConfirmarCancelacion.js";
 import flowConfirmarCancelacionPBorrar from "./flows/flowConfirmarCancelacionPBorrar.js"
 import flowSeleccionarTurnoPBorrar from "./flows/flowSeleccionarTurnoPBorrar.js";
+import flowNombre from "./flows/flowNombre.js";
 /* import chatgpt from "./services/openai/chatgpt.js";
 import GoogleSheetService from "./services/sheets/index.js"; */
 /* 
@@ -35,6 +36,7 @@ const main = async () => {
     flowSelecion1,
     flowSeleccion3,
     flowConsultar,
+    flowNombre,
     flowBusqueda,
     flowAgendar,
     flowReagendar,

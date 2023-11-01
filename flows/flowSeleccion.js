@@ -1,6 +1,7 @@
 import bot from "@bot-whatsapp/bot";
-import flowBusqueda from "./flowBusqueda.js";
+import delay from "../app.js"
 import { consultarTurnos } from "../services/sheets/index.js";
+import flowNombre from "./flowNombre.js";
 /* import pkg from '@bot-whatsapp/bot';
 const {EVENTS} = pkg; */
 let error = 0;
@@ -51,12 +52,13 @@ const flowSelecion1 = bot
   )
   .addAction(
     { capture: true, delay: 2000 },
-    async (ctx, { state, gotoFlow, flowDynamic }) => {
+    async (ctx, { state, gotoFlow, flowDynamic, endFlow }) => {
       const resultado = validarFecha(ctx.body);
       
       if (!resultado.valido) {
         error++
         flowDynamic(resultado.log);
+        await delay(2000)
         /* console.log(`CANTIDAD DE ERRORES ✖✖➖➖✖✖➖✖✖ ${error}`) */
         await state.update({ errorHandler: error });
         const myState = state.getMyState();
@@ -66,7 +68,7 @@ const flowSelecion1 = bot
         return gotoFlow(flowSelecion1);
       } else {
         await state.update({ dia: ctx.body });
-        return await gotoFlow(flowBusqueda);
+        return await gotoFlow(flowNombre);
       }
     }
   )
