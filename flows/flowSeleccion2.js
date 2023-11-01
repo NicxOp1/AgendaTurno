@@ -1,6 +1,7 @@
 //este es el 
 import bot from "@bot-whatsapp/bot";
 import { consultarTurnos } from "../services/sheets/index.js";
+import flowSeleccionarTurno from "./flowSeleccionarTurno.js";
 /* import pkg from '@bot-whatsapp/bot';
 const {EVENTS} = pkg; */
 let error = 0;
@@ -42,36 +43,26 @@ function validarFecha(fechaStr) {
 
   return { valido: true, log: "Fecha válida." };
 }
-const flowSelecion2 = bot
+const flowConsultar = bot
 .addKeyword("2",{ sensitive: true })
 .addAnswer(
    `Perfecto aquí se encuentran tus turnos ya agendados..
-  Recuerda siempre que quieras *Cancelar*`
-)
-.addAction(
-  {delay: 2000 },
-  async (ctx, { state, gotoFlow, flowDynamic }) => {
+Recuerda siempre que quieras *Cancelar*`,
+  {capture:false },
+  async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
     const myState = state.getMyState();
     console.log(myState.telefono)
-    let consulta = consultarTurnos(myState.telefono)
-    console.log("Turnos consultados ✖✖➖➖✖✖➖✖✖ ",consulta)
-    return consulta['Fecha']
-  /*   const resultado = validarFecha(ctx.body); */
-    /* 
-    if (!resultado.valido) {
-      error++
-      flowDynamic(resultado.log);
-       console.log(`CANTIDAD DE ERRORES ✖✖➖➖✖✖➖✖✖ ${error}`) 
-      await state.update({ errorHandler: error });
-      const myState = state.getMyState();
-      if(myState.errorHandler>=3){
-        return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-      }
-      return gotoFlow(flowSelecion);
-    } else {
-      await state.update({ dia: ctx.body });
-      return await gotoFlow(flowBusqueda);
-    } */
+    let mensaje = await consultarTurnos(myState.telefono)
+    console.log("Turnos consultados ✖✖➖➖✖✖➖✖✖ ",mensaje.contadorTurnos)
+    await state.update({contadorTurnos:mensaje.contadorTurnos});
+
+    if(mensaje.contadorTurnos>0){
+      await flowDynamic(mensaje.mensaje)
+      return gotoFlow(flowSeleccionarTurno)
+    }else{
+      flowDynamic("no tienes ningun turno agendado.!")
+      return endFlow()
+    }
   }
 )
-export default flowSelecion2
+export default flowConsultar

@@ -5,11 +5,16 @@ import BaileysProvider from "@bot-whatsapp/provider/baileys";
 import MockAdapter from "@bot-whatsapp/database/mock";
 import flowPrincipal from "./flows/flowBienvenida.js"
 import flowSelecion1 from "./flows/flowSeleccion.js";
-import flowSelecion2 from "./flows/flowSeleccion2.js"
+import flowConsultar from "./flows/flowSeleccion2.js";
+import flowSeleccion3 from "./flows/flowSeleccion3.js";
 import flowBusqueda from "./flows/flowBusqueda.js";
 import flowAgendar from "./flows/flowAgendar.js";
 import flowReagendar from "./flows/flowReagendar.js";
 import flowCambiarFecha from "./flows/flowCambiarFecha.js";
+import flowSeleccionarTurno from "./flows/flowSeleccionarTurno.js";
+import flowConfirmarCancelacion from "./flows/flowConfirmarCancelacion.js";
+import flowConfirmarCancelacionPBorrar from "./flows/flowConfirmarCancelacionPBorrar.js"
+import flowSeleccionarTurnoPBorrar from "./flows/flowSeleccionarTurnoPBorrar.js";
 /* import chatgpt from "./services/openai/chatgpt.js";
 import GoogleSheetService from "./services/sheets/index.js"; */
 /* 
@@ -28,11 +33,16 @@ const main = async () => {
   const adapterFlow = bot.createFlow([
     flowPrincipal,
     flowSelecion1,
-    flowSelecion2,
+    flowSeleccion3,
+    flowConsultar,
     flowBusqueda,
     flowAgendar,
     flowReagendar,
     flowCambiarFecha,
+    flowSeleccionarTurno,
+    flowConfirmarCancelacion,
+    flowConfirmarCancelacionPBorrar,
+    flowSeleccionarTurnoPBorrar,
   ]);
   const adapterProvider = bot.createProvider(BaileysProvider);
 

@@ -2,22 +2,64 @@ import bot from "@bot-whatsapp/bot";
 import { agendarTurno } from "../services/sheets/index.js";
 import flowCambiarFecha from "./flowCambiarFecha.js";
 
+function esHorarioValido(horario) {
+  // Dividir la hora y los minutos
+  var partes = horario.split(':');
+  var hora = parseInt(partes[0]);
+  var minutos = parseInt(partes[1]);
+
+  // Verificar si la hora está entre 10 y 18
+  if (hora < 10 || hora > 18) {
+      return false;
+  }
+
+  // Verificar si los minutos son 00 o 30
+  if (minutos !== 0 && minutos !== 30) {
+      return false;
+  }
+
+  // Verificar si la hora es 18 y los minutos son más de 30
+  if (hora === 18 && minutos > 30) {
+      return false;
+  }
+
+  // Si pasó todas las verificaciones, el horario es válido
+  return true;
+}
+
+
 const flowReagendar = bot
 .addKeyword('bot')
 .addAnswer(`Porfavor ingresá explicitamente el horario que te gustaria tomar. Si queres cambiar el dia escribe *Cambiar*`,
          { capture: true, delay : 2000 },
          async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-            const myState = state.getMyState();
-            if(myState.horariosPosibles.includes(ctx.body)){
+           const myState = state.getMyState();
+          if(myState.horariosPosibles){
+            if(myState.horariosPosibles.includes(ctx.body)){              
+              flowDynamic("Perfecto, estamos procesando los datos...")
+              await state.update({horario:ctx.body})
+              console.log(myState)
+              const agendar = await agendarTurno(
+                  myState.dia,
+                  myState.horario,
+                  myState.servicio,
+                  myState.nombre,
+                  myState.telefono,
+                );
+                flowDynamic(agendar);
+                return endFlow(); 
+            }
+          }
+            if(esHorarioValido(ctx.body)){
                 flowDynamic("Perfecto, estamos procesando los datos...")
                 await state.update({horario:ctx.body})
-                const myState = state.getMyState();
+                console.log(myState)
                 const agendar = await agendarTurno(
                     myState.dia,
                     myState.horario,
                     myState.servicio,
                     myState.nombre,
-                    myState.telefono
+                    myState.telefono,
                   );
                   flowDynamic(agendar);
                   return endFlow(); 
@@ -25,7 +67,8 @@ const flowReagendar = bot
              else if(ctx.body == "Cambiar"){
               return await gotoFlow(flowCambiarFecha)
             }else{
-              flowDynamic('Has ingresado los datos mal.')
+              flowDynamic('Has ingresado los datos mal...',
+                          'Porfavor vuelve a intentarlo')
               error++
               await state.update({ errorHandler: error });
               const myState = state.getMyState();
