@@ -31,8 +31,7 @@ let listadoDeHorarios= 0
 const flowAgendar = bot
 .addKeyword("bot")
 .addAnswer(
-  `Dime el horario que te gustaria el turno
-  Recuerda el formato HH:MM ej: 13:30⏱`,
+  `⏰ Por favor, dime a qué hora te gustaría tu turno. Recuerda usar el formato HH:MM, por ejemplo: 13:30⏱.`,
     { capture: true, delay : 2000 },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
       let error = 0
@@ -56,13 +55,14 @@ const flowAgendar = bot
           let listadoDeHorarios = '';
           let dia = agendar.DiasDisponibles;
           let lista = '';
+          dia.Horarios.sort();
           for (let i = 0; i < dia.Horarios.length; i++) {
             let hora = dia.Horarios[i];
             lista += hora + (i % 3 === 2 ? '\n' : ' ');}
           nuevoDia = dia.Fecha;
           listadoDeHorarios = lista;
           await delay(2000)
-          flowDynamic(`Para el dia ${dia.Fecha} hay los siguientes turnos disponibles:\n\n${lista}`);
+          flowDynamic(`🗓️Para el dia ${dia.Fecha} hay los siguientes turnos disponibles:\n\n${lista}`);
           await state.update({dia: nuevoDia});
           await state.update({horariosPosibles: listadoDeHorarios});
           await delay(2000)
@@ -76,9 +76,9 @@ const flowAgendar = bot
         await state.update({ errorHandler: error });
         const myState = state.getMyState();
         if(myState.errorHandler>=3){
-          return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+          return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }
-        flowDynamic(`Lo siento😥 , escribiste mal el horario\n
+        flowDynamic(`Lo siento😞 , escribiste mal el horario\n
 recorda que solo aceptamos turnos de 10:00 a 18:30\n
 Solo pueden intervalos de 30'👀\n
 El formato es *hh/mm* ej: *13:00*⌚`)

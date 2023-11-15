@@ -4,14 +4,14 @@ import flowConfirmarCancelacion from "./flowConfirmarCancelacion.js";
 const flowSeleccionarTurno = bot
 .addKeyword("seleccionar_turno", { sensitive: true })
 .addAnswer(
-  "Por favor, selecciona el turno que deseas cambiar introduciendo su número:",
+  "🔢 Por favor, selecciona el turno que deseas cambiar introduciendo su número:",
   { capture: true },
   async (ctx, { state, gotoFlow,flowDynamic }) => {
     const myState = state.getMyState();
     let numeroTurno = parseInt(ctx.body);
     // Asegúrate de que el número del turno es un número y está dentro del rango válido.
     if (isNaN(numeroTurno) || numeroTurno < 1 || numeroTurno > myState.contadorTurnos.length) {
-      return await flowDynamic("El número que has introducido no es válido. Por favor, intenta de nuevo.");
+      return await flowDynamic("❌ El número que has introducido no es válido. Por favor, intenta de nuevo.");
     }
     // Almacena el número del turno en el estado.
     await state.update({ numeroTurno:numeroTurno });
