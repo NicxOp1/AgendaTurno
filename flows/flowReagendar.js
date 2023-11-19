@@ -31,14 +31,14 @@ function esHorarioValido(horario) {
 
 const flowReagendar = bot
 .addKeyword('bot')
-.addAnswer(`Porfavor ingresá explicitamente el horario que te gustaria tomar. Si queres cambiar el dia escribe *Cambiar*`,
+.addAnswer(`⏲️ Por favor, ingresa explícitamente la hora que te gustaría reservar. Si deseas cambiar el día, escribe *Cambiar*.`,
          { capture: true, delay : 2000 },
          async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
           console.log("EL HORARIO DEL TURNO A CAMBIAR: " + ctx.body)
            const myState = state.getMyState();
           if(myState.horariosPosibles){
             if(myState.horariosPosibles.includes(ctx.body)){               
-              flowDynamic("Perfecto, estamos procesando los datos...")
+              flowDynamic("🔄 Perfecto, estamos procesando los datos...")
               await state.update({horario:ctx.body})
               console.log("ES HORARIO POSIBLE"+ctx.body)
               const agendar = await agendarTurno(
@@ -53,7 +53,7 @@ const flowReagendar = bot
             }
           }
             if(esHorarioValido(ctx.body)){
-                flowDynamic("Perfecto, estamos procesando los datos...")
+                flowDynamic("🔄 Perfecto, estamos procesando los datos...")
                 await state.update({horario:ctx.body})
                 console.log("ES HORARIO VALIDO: " + ctx.body)
                 const agendar = await agendarTurno(
@@ -69,15 +69,14 @@ const flowReagendar = bot
              else if(ctx.body == "Cambiar"){
               return await gotoFlow(flowCambiarFecha)
             }else{
-              flowDynamic('Has ingresado los datos mal...',
-                          'Porfavor vuelve a intentarlo')
+              flowDynamic('❌ Parece que hubo un error al ingresar los datos. Por favor, intenta de nuevo.')
               error++
               await state.update({ errorHandler: error });
               const myState = state.getMyState();
               if(myState.errorHandler>=3){
-                return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+                return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
               }
-              flowDynamic("Lo siento, no se encuentra disponible el horario seleccionado, vuelve a intentarlo...")
+              flowDynamic("Lo siento😔, no se encuentra disponible el horario seleccionado, vuelve a intentarlo...")
               return await gotoFlow(flowReagendar)
             } 
             

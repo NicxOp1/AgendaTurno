@@ -28,7 +28,7 @@ const flowConfirmarCancelacionPBorrar = bot
       await state.update({ errorHandler: error });
       const myState = state.getMyState();
       if(myState.errorHandler>=3){
-        return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+        return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
       }
       return await gotoFlow(flowSeleccionarTurnoPBorrar);
     } else {
@@ -36,7 +36,7 @@ const flowConfirmarCancelacionPBorrar = bot
       await state.update({ errorHandler: error });
       const myState = state.getMyState();
       if(myState.errorHandler>=3){
-        return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+        return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
       }
       // Si el usuario introduce algo distinto de sí o no, pide una nueva confirmación.
       return gotoFlow(flowConfirmarCancelacionPBorrar);

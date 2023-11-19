@@ -47,8 +47,8 @@ function validarFecha(fechaStr) {
 const flowSelecion1 = bot
   .addKeyword("1",{ sensitive: true }) //Reservar un turno
   .addAnswer(
-    "Ingresá la fecha que buscas atenderte. Recordá el formato DD/MM/AA",
-    "Recuerda siempre que quieras *Cancelar*",
+    "📆 Por favor, ingresa la fecha en la que deseas atenderte. Recuerda usar el formato DD/MM/AA.",
+    "🚫 Puedes escribir *Cancelar* si necesitas detener el proceso.",
   )
   .addAction(
     { capture: true, delay: 2000 },
@@ -63,7 +63,7 @@ const flowSelecion1 = bot
         await state.update({ errorHandler: error });
         const myState = state.getMyState();
         if(myState.errorHandler>=3){
-          return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+          return endFlow({body: '⚠️ Has superado los 3 intentos. Por favor, escribe *Hola* para comenzar de nuevo. ¡Gracias!'})
         }
         return gotoFlow(flowSelecion1);
       } else {

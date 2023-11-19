@@ -4,7 +4,7 @@ let error = 0
 const flowNombre = bot
 .addKeyword('bot')
 .addAnswer(
-    "¿Cual es tu nombre?",
+    "👤 ¿Podrías decirme tu nombre, por favor?",
     { capture: true, delay : 2000 },
     async (ctx, {state,gotoFlow }) => {
       console.log(ctx.body)

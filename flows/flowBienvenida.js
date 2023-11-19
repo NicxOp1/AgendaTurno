@@ -3,10 +3,12 @@ import bot from "@bot-whatsapp/bot";
 import flowSelecion1 from "./flowSeleccion.js";
 import flowSeleccion2 from "./flowSeleccion2.js";
 import flowSeleccion3 from "./flowSeleccion3.js";
+import sendMessage from "../pruebaBaileys.js"
 /*import flowSeleccion4 from "./flowSeleccion4.js";
 import flowSeleccion5 from "./flowSeleccion5.js"; */
 /* const {EVENTS} = pkg;
 */
+import {checkDates} from "../pruebaBaileys.js"
 let error = 0;
 const flowPrincipal = bot
   .addKeyword("hola")
@@ -30,6 +32,7 @@ simplemente escribe *cancelar*.
       console.log("ctx del flow Bienvenida:",ctx.body)
       await state.update({ telefono: ctx.from });
       if(parseInt(ctx.body)==1){
+        /* return await flowDynamic(checkDates()) */
         await gotoFlow(flowSelecion1)
       }else if(parseInt(ctx.body)==2){
         console.log("entro en consultar o cambiar")
@@ -42,15 +45,15 @@ simplemente escribe *cancelar*.
         await gotoFlow(flowSeleccion5)
       } */
       if(ctx.body.toLowerCase()=="cancelar"){
-        return endFlow({body:'Nos vemos pronto!, en caso de volver a encenderme escribe *hola*'})
+        return endFlow({body:'👋Nos vemos pronto!, en caso de volver a encenderme escribe *hola*'})
       }else{
-        await flowDynamic("Lo lamento, te has equivocado con el numero ingresado")
+        await flowDynamic("Lo lamento😔, te has equivocado con el numero ingresado")
         error++;
         await state.update({ errorHandler: error });
         const myState = state.getMyState();
         console.log(myState.errorHandler)
         if(myState.errorHandler>=3){
-          return endFlow({body: 'Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+          return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }
         return await gotoFlow(flowPrincipal)
       }
