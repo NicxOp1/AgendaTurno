@@ -1,6 +1,7 @@
 import bot from "@bot-whatsapp/bot";
 import flowAgendar from "./flowAgendar.js";
 import delay from "../app.js";
+import flowSelecion4 from "./flowSeleccion4.js";
 let error = 0
 const flowBusqueda = bot
 .addKeyword('bot')
@@ -18,7 +19,7 @@ const flowBusqueda = bot
             const ServicioSeleccionado = 'Esculpidas'
             await state.update({ servicio: ServicioSeleccionado })
             if(myState.Consulta){
-                return await gotoFlow(flowTurnosPorDia)
+                return await gotoFlow(flowSelecion4)
             }
             await gotoFlow(flowAgendar)
             flowDynamic()
@@ -28,7 +29,7 @@ const flowBusqueda = bot
             const ServicioSeleccionado = 'Kapping con acrilico'
             await state.update({ servicio: ServicioSeleccionado })
             if(myState.Consulta){
-                return await gotoFlow(flowTurnosPorDia)
+                return await gotoFlow(flowSelecion4)
             }
             await gotoFlow(flowAgendar)
             flowDynamic()
@@ -38,7 +39,7 @@ const flowBusqueda = bot
             const ServicioSeleccionado = 'Kapping con gel'
             await state.update({ servicio: ServicioSeleccionado })
             if(myState.Consulta){
-                return await gotoFlow(flowTurnosPorDia)
+                return await gotoFlow(flowSelecion4)
             }
             await gotoFlow(flowAgendar)
             flowDynamic()
@@ -48,7 +49,7 @@ const flowBusqueda = bot
             const ServicioSeleccionado = 'Esmaltado Semipermanente'
             await state.update({ servicio: ServicioSeleccionado })
             if(myState.Consulta){
-                return await gotoFlow(flowTurnosPorDia)
+                return await gotoFlow(flowSelecion4)
             }
             await gotoFlow(flowAgendar)
             flowDynamic()
