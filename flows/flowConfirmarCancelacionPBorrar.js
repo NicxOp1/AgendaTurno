@@ -10,6 +10,10 @@ const flowConfirmarCancelacionPBorrar = bot
   "¿Estás seguro de que quieres cancelar este turno? Responde *sí* para confirmar o *no* para seleccionar otro turno.",
   { capture: true },
   async (ctx, { state, gotoFlow,flowDynamic,endFlow }) => {
+    clearTimeout(timeoutId);
+timeoutId = setTimeout(() => {
+  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+}, 5 * 60 * 1000); // 5 minutos
     const myState = state.getMyState();
     let confirmacion = ctx.body.toLowerCase();
     // Asegúrate de que el usuario ha confirmado la cancelación.

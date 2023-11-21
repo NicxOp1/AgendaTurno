@@ -53,6 +53,11 @@ const flowSelecion1 = bot
   .addAction(
     { capture: true, delay: 2000 },
     async (ctx, { state, gotoFlow, flowDynamic, endFlow }) => {
+      clearTimeout(timeoutId);
+timeoutId = setTimeout(() => {
+  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+}, 5 * 60 * 1000); // 5 minutos
+
       const resultado = validarFecha(ctx.body);
       
       if (!resultado.valido) {

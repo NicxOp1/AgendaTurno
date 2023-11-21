@@ -7,6 +7,11 @@ const flowNombre = bot
     "👤 ¿Podrías decirme tu nombre, por favor?",
     { capture: true, delay : 2000 },
     async (ctx, {state,gotoFlow }) => {
+      clearTimeout(timeoutId);
+timeoutId = setTimeout(() => {
+  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+}, 5 * 60 * 1000); // 5 minutos
+
       console.log(ctx.body)
       await state.update({ nombre: ctx.body });
 /* testing      await state.update({ servicio: "Esculpidas" });
