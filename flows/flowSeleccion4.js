@@ -41,7 +41,7 @@ function validarFecha(fechaStr) {
 }
 
 const flowSelecion4 = bot
-.addKeyword("4",{ sensitive: true })
+.addKeyword("bot")
 .addAction(
     null,
    { capture : false},
@@ -57,10 +57,6 @@ const flowSelecion4 = bot
    Ej: 12/02/23 `,
   { capture : true , delay : 2000 },
   async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-    clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
     const myState = state.getMyState();
     /* console.log(myState.telefono) */
     let mensaje = await consultarTurnos(myState.telefono)

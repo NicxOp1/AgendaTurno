@@ -17,6 +17,7 @@ import flowConfirmarCancelacionPBorrar from "./flows/flowConfirmarCancelacionPBo
 import flowSeleccionarTurnoPBorrar from "./flows/flowSeleccionarTurnoPBorrar.js";
 import flowNombre from "./flows/flowNombre.js";
 import flowSelecion4 from "./flows/flowSeleccion4.js";
+import flowBarbero from "./flows/flowBarbero.js";
 
 const GLOBAL_STATE = [];
 export default function delay(ms) {
@@ -27,6 +28,7 @@ const main = async () => {
   const adapterFlow = bot.createFlow([
     flowPrincipal,
     flowSelecion1,
+    flowBarbero,
     flowSeleccion3,
     flowConsultar,
     flowNombre,

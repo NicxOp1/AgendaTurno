@@ -13,11 +13,6 @@ const flowBusqueda = bot
     'D)💅Esmaltado Semi-permanente'],
     {capture:true, delay : 2000},
     async(ctx,{flowDynamic,state,gotoFlow})=>{
-        clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
         if(ctx.body==='A'){
             const myState = state.getMyState();
 

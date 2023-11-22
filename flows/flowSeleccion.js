@@ -45,7 +45,7 @@ function validarFecha(fechaStr) {
 }
 
 const flowSelecion1 = bot
-  .addKeyword("1",{ sensitive: true }) //Reservar un turno
+  .addKeyword("bot") //Reservar un turno
   .addAnswer(
     "📆 Por favor, ingresa la fecha en la que deseas atenderte. Recuerda usar el formato DD/MM/AA.",
     "🚫 Puedes escribir *Cancelar* si necesitas detener el proceso.",
@@ -53,13 +53,7 @@ const flowSelecion1 = bot
   .addAction(
     { capture: true, delay: 2000 },
     async (ctx, { state, gotoFlow, flowDynamic, endFlow }) => {
-      clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
       const resultado = validarFecha(ctx.body);
-      
       if (!resultado.valido) {
         error++
         flowDynamic(resultado.log);

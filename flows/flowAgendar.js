@@ -34,10 +34,6 @@ const flowAgendar = bot
   `⏰ Por favor, dime a qué hora te gustaría tu turno. Recuerda usar el formato HH:MM, por ejemplo: 13:30⏱.`,
     { capture: true, delay : 2000 },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-      clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
       let error = 0
       if (esHorarioValido(ctx.body)) {
         await state.update({ horario: ctx.body }); 

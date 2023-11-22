@@ -34,11 +34,6 @@ const flowReagendar = bot
 .addAnswer(`⏲️ Por favor, ingresa explícitamente la hora que te gustaría reservar. Si deseas cambiar el día, escribe *Cambiar*.`,
          { capture: true, delay : 2000 },
          async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-          clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
           console.log("EL HORARIO DEL TURNO A CAMBIAR: " + ctx.body)
            const myState = state.getMyState();
           if(myState.horariosPosibles){
