@@ -18,6 +18,7 @@ import flowSeleccionarTurnoPBorrar from "./flows/flowSeleccionarTurnoPBorrar.js"
 import flowNombre from "./flows/flowNombre.js";
 import flowSelecion4 from "./flows/flowSeleccion4.js";
 import flowBarbero from "./flows/flowBarbero.js";
+import flowSeleccionBarbero from "./flows/flowSeleccionBarbero.js";
 
 const GLOBAL_STATE = [];
 export default function delay(ms) {
@@ -40,7 +41,8 @@ const main = async () => {
     flowConfirmarCancelacion,
     flowConfirmarCancelacionPBorrar,
     flowSeleccionarTurnoPBorrar,
-    flowSelecion4
+    flowSelecion4,
+    flowSeleccionBarbero
   ]);
   const adapterProvider = bot.createProvider(BaileysProvider);
 

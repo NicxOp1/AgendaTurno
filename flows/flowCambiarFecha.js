@@ -58,6 +58,8 @@ Recordá el formato DD/MM/AA`,
               await state.update({ errorHandler: error });
               const myState = state.getMyState();
               if(myState.errorHandler>=3){
+                error = 0
+                await state.update({ errorHandler: error });
                 return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
               }
               return await gotoFlow(flowSelecion1); 

@@ -47,9 +47,12 @@ const flowConsultar = bot
 .addKeyword("bot")
 .addAnswer(
    `Perfecto aquí se encuentran tus turnos ya agendados..
-Recuerda siempre que quieras *Cancelar*`,
-  {capture:false },
+Recuerda siempre que quieras salir escribe *Cancelar*`,
+  {capture:false, delay: 2000 },
   async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
+    if(ctx.body.toLowerCase=="cancelar"){
+      return endFlow({body: 'Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+    }
     const myState = state.getMyState();
     console.log(myState.telefono)
     let mensaje = await consultarTurnos(myState.telefono)

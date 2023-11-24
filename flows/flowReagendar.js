@@ -74,6 +74,8 @@ const flowReagendar = bot
               await state.update({ errorHandler: error });
               const myState = state.getMyState();
               if(myState.errorHandler>=3){
+                error = 0
+                await state.update({ errorHandler: error });
                 return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
               }
               flowDynamic("Lo siento😔, no se encuentra disponible el horario seleccionado, vuelve a intentarlo...")

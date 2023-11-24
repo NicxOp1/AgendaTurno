@@ -8,7 +8,7 @@ const flowConfirmarCancelacionPBorrar = bot
 .addKeyword("confirmar_cancelacion", { sensitive: true })
 .addAnswer(
   "¿Estás seguro de que quieres cancelar este turno? Responde *sí* para confirmar o *no* para seleccionar otro turno.",
-  { capture: true },
+  { capture: true, delay : 2000 },
   async (ctx, { state, gotoFlow,flowDynamic,endFlow }) => {
 
     const myState = state.getMyState();
@@ -29,6 +29,8 @@ const flowConfirmarCancelacionPBorrar = bot
       await state.update({ errorHandler: error });
       const myState = state.getMyState();
       if(myState.errorHandler>=3){
+        error = 0
+        await state.update({ errorHandler: error });
         return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
       }
       return await gotoFlow(flowSeleccionarTurnoPBorrar);
@@ -37,6 +39,8 @@ const flowConfirmarCancelacionPBorrar = bot
       await state.update({ errorHandler: error });
       const myState = state.getMyState();
       if(myState.errorHandler>=3){
+        error = 0
+        await state.update({ errorHandler: error });
         return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
       }
       // Si el usuario introduce algo distinto de sí o no, pide una nueva confirmación.

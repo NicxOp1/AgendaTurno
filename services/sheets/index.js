@@ -134,7 +134,8 @@ export const agendarTurno = async (
   horaSolicitada,
   servicio,
   cliente,
-  telefono
+  telefono,
+  barbero
 ) => {
   try {
     // 1. Verificar si ya existe un turno con el mismo número de teléfono.
@@ -151,7 +152,8 @@ export const agendarTurno = async (
     const disponibilidad = await verificarYBuscarDisponibilidad(
       fecha,
       horaSolicitada,
-      servicio
+      servicio,
+      barbero
     );
     console.log('Disponibilidad:', disponibilidad);
     if (!disponibilidad.HorarioAprobado) {
@@ -164,7 +166,7 @@ export const agendarTurno = async (
       } 
     } else {
       console.log("Turno a punto de agendarse...");
-      let devolucion = await agregarTurno(fecha, horaSolicitada, servicio, cliente, telefono);
+      let devolucion = await agregarTurno(fecha, horaSolicitada, servicio, cliente, telefono,barbero);
       console.log('Devolución de agregarTurno:', devolucion);
       return devolucion;
     }
@@ -179,7 +181,8 @@ export const agregarTurno = async (
   horaInicio,
   servicio,
   cliente,
-  telefono
+  telefono,
+  barbero
   ) => {
     try {
       const CREDENTIALS ={
@@ -234,6 +237,7 @@ export const agregarTurno = async (
       Servicio: servicio,
       Cliente: cliente,
       Telefono: telefono,
+      Barbero: barbero
     };
     
     await doc.useServiceAccountAuth(CREDENTIALS);
@@ -247,14 +251,14 @@ export const agregarTurno = async (
 
     console.log('Turno agendado con éxito');
     
-    return `¡Perfecto! ${cliente}, tu turno ya fue agendado. Iniciará a las ${horaInicio} y finalizará a las ${horaFinalizacion}. ¡Gracias por elegirnos! 😊👍`;
+    return `¡Perfecto! ${cliente}, tu turno ya fue agendado. Con el barbero ${barbero} , iniciará a las ${horaInicio} y finalizará a las ${horaFinalizacion}. ¡Gracias por elegirnos! 😊👍`;
   } catch (error) {
     console.error('Ocurrió un error al agregar el turno:', error);
     throw error;
   }
 };
 
-export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
+export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) => {
   try {
     let turnos = {
       Fecha: [],
@@ -263,7 +267,9 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
       Servicio: [],
       Cliente: [],
       Telefono: [],
-      Duración: [], // Agregamos una nueva clave para almacenar la duración del servicio.
+      Barbero: [], 
+      HorarioLaboralBarbero: "",
+      DiasLaboralesBarbero: "", 
     };
     const CREDENTIALS ={
       "type": "service_account",
@@ -277,7 +283,7 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
       "universe_domain": "googleapis.com"
-    }    
+    } 
     await doc.useServiceAccountAuth(CREDENTIALS);
     await doc.loadInfo();
     let sheet = doc.sheetsByTitle["Hoja 1"];
@@ -287,16 +293,17 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
       const row = rows[index];
       const fechaColumna = row._rawData[0];
       const servicioColumna = row._rawData[3];
-      if (fechaColumna === fecha && servicioColumna === servicio) {
+      const barberoColumna = row._rawData[6]; 
+      if (fechaColumna === fecha && servicioColumna === servicio && barberoColumna === barbero) {
         turnos["Fecha"].push(row._rawData[0]);
         turnos["Inicio"].push(row._rawData[1]);
         turnos["Finalizacion"].push(row._rawData[2]);
         turnos["Servicio"].push(row._rawData[3]);
         turnos["Cliente"].push(row._rawData[4]);
         turnos["Telefono"].push(row._rawData[5]);
+        turnos["Barbero"].push(row._rawData[6]);
       }
     }
-    console.log('Turnos obtenidos:', turnos);
 
     // Ahora, vamos a cargar la información de duración desde 'Hoja 2'.
     sheet = doc.sheetsByTitle["Hoja 2"];
@@ -307,8 +314,22 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
       const duracionServicio = row._rawData[1];
       if (nombreServicio === servicio) {
         turnos["Duración"] = duracionServicio;
-        console.log('Duración del servicio obtenida:', duracionServicio);
         break; // Terminamos la búsqueda una vez que encontramos la duración.
+      }
+    }
+
+    // Ahora, vamos a cargar la información del horario laboral del barbero desde 'Hoja 3'.
+    sheet = doc.sheetsByTitle["Hoja 3"];
+    rows = await sheet.getRows();
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      const nombreBarbero = row._rawData[0];
+      const diasDeTrabajo = row._rawData[1];
+      const horarioLaboral = row._rawData[2];
+      if (nombreBarbero === barbero) {
+        turnos["DiasLaboralesBarbero"]= diasDeTrabajo;
+        turnos["HorarioLaboralBarbero"] = horarioLaboral; // Agregado aquí
+        break; // Terminamos la búsqueda una vez que encontramos el horario laboral.
       }
     }
 
@@ -318,6 +339,7 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
     throw error;
   }
 };
+
 
 export const buscarTurnosDisponibles = async (fecha, servicio) => {
   try {
@@ -365,13 +387,15 @@ export const buscarTurnosDisponibles = async (fecha, servicio) => {
 export const verificarDisponibilidad = async (
   fecha,
   horaSolicitada,
-  servicio
+  servicio,
+  barbero
 ) => {
   try {
     // 1. Obtener todos los turnos para la fecha dada.
     const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(
       fecha,
-      servicio
+      servicio,
+      barbero
     );
     console.log('Turnos por día y servicio obtenidos:', turnosPorDiaYServicio);
 
@@ -379,20 +403,23 @@ export const verificarDisponibilidad = async (
     const duracionServicio = moment.duration(turnosPorDiaYServicio["Duración"]);
     console.log('Duración del servicio:', duracionServicio);
 
-    // 3. Verificar disponibilidad en la hora solicitada.
+    // 3. Extraer el horario de inicio y fin del horario laboral del barbero.
+    const [inicioLaboral, finLaboral] = turnosPorDiaYServicio["HorarioLaboralBarbero"].split('/');
+
+    // 4. Verificar disponibilidad en la hora solicitada.
     // Calcula el intervalo de tiempo ocupado por el servicio solicitado.
     const horaInicioSolicitada = moment(horaSolicitada, "HH:mm");
     const horaFinSolicitada = moment(horaInicioSolicitada).add(duracionServicio);
 
-    // Verifica si la hora de inicio del turno solicitado es antes de las 10:00.
-    if (horaInicioSolicitada.isBefore(moment('10:00', 'HH:mm'))) {
-      console.log('El turno solicitado es demasiado temprano. Los turnos pueden comenzar a las 10:00 como muy temprano.');
+    // Verifica si la hora de inicio del turno solicitado es antes del inicio del horario laboral.
+    if (horaInicioSolicitada.isBefore(moment(inicioLaboral, 'HH:mm'))) {
+      console.log('El turno solicitado es demasiado temprano. Los turnos pueden comenzar a las ' + inicioLaboral + ' como muy temprano.');
       return false;
     }
 
     // Verifica si la hora de finalización del turno solicitado excede el horario laboral.
-    if (horaFinSolicitada.isAfter(moment('20:00', 'HH:mm'))) {
-      console.log('El turno solicitado termina después del horario laboral. Los turnos deben terminar a las 20:00 como muy tarde.');
+    if (horaFinSolicitada.isAfter(moment(finLaboral, 'HH:mm'))) {
+      console.log('El turno solicitado termina después del horario laboral. Los turnos deben terminar a las ' + finLaboral + ' como muy tarde.');
       return false;
     }
 
@@ -426,6 +453,7 @@ export const verificarDisponibilidad = async (
     throw error;
   }
 };
+
 
 export const buscarHorariosDisponibles = async (fecha, servicio) => {
   try {
@@ -470,15 +498,84 @@ export const buscarHorariosDisponibles = async (fecha, servicio) => {
   }
 };
 
-export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio) => {
+async function obtenerDiasDeTrabajo(barbero) {
+  const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  let diasLaborables = [];
+  const CREDENTIALS = {
+    "type": "service_account",
+    "project_id": "calendar-turnos-400220",
+    "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+    "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+    "client_id": "107884470593691798095",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  
+  // Autenticación y carga de información.
+  await doc.useServiceAccountAuth(CREDENTIALS);
+  await doc.loadInfo();
+
+  // Acceso a la "Hoja 3".
+  let sheet = doc.sheetsByTitle["Hoja 3"];
+
+  // Obtención de todas las filas.
+  let rows = await sheet.getRows();
+
+  // Búsqueda del barbero en las filas.
+  for (let index = 0; index < rows.length; index++) {
+    const row = rows[index];
+    const nombreBarbero = row._rawData[0];
+
+    if (nombreBarbero === barbero) {
+      // Si se encuentra el barbero, se procesan sus días de trabajo.
+      const diasDeTrabajo = row._rawData[1];
+
+      // Divide los días de trabajo por comas y guiones.
+      const partes = diasDeTrabajo.split(/,|-/);
+
+      partes.forEach(parte => {
+        parte = parte.trim(); // Elimina los espacios en blanco al principio y al final.
+
+        if (parte.includes('-')) {
+          // Si la parte incluye un guión, es un rango de días.
+          const [inicio, fin] = parte.split('-');
+          const indiceInicio = dias.indexOf(inicio);
+          const indiceFin = dias.indexOf(fin);
+
+          // Añade todos los días en el rango al array de días laborables.
+          for (let i = indiceInicio; i <= indiceFin; i++) {
+            diasLaborables.push(i);
+          }
+        } else {
+          // Si la parte no incluye un guión, es un solo día.
+          const indice = dias.indexOf(parte);
+          diasLaborables.push(indice);
+        }
+      });
+
+      break; // Termina la búsqueda una vez que se encuentran los días de trabajo del barbero.
+    }
+  }
+
+  return diasLaborables;
+}
+
+export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio, barbero) => { // Agregado aquí
   try {
     // Convierte la fecha de inicio al formato de Moment.js.
-    let fecha = moment(fechaInicio, 'DD/MM/YY').add(1, 'days');
+    let fecha = moment(fechaInicio, 'DD/MM/YY');
 
-    // Verifica la disponibilidad para los próximos 3 días.
-    for (let i = 0; i < 3; i++) {
-      // Verifica si el día es entre martes y sábado.
-      if (fecha.day() >= 2 && fecha.day() <= 6) {
+    // Obtiene los días de trabajo del barbero.
+    const diasDeTrabajo = await obtenerDiasDeTrabajo(barbero); // Asegúrate de implementar esta función
+
+    // Verifica la disponibilidad para el día actual y el siguiente.
+    for (let i = 0; i < 2; i++) { // Modificado aquí
+      // Verifica si el día es un día de trabajo para el barbero.
+      if (diasDeTrabajo.includes(fecha.day())) { // Modificado aquí
         // Busca los horarios disponibles para este día.
         const horariosDisponibles = await buscarHorariosDisponibles(fecha.format('DD/MM/YY'), servicio);
         
@@ -494,9 +591,9 @@ export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio
       fecha.add(1, 'days');
     }
 
-    // Si no se encontró ningún día disponible en los próximos 3 días, devuelve un mensaje indicando esto.
+    // Si no se encontró ningún día disponible en los próximos 2 días, devuelve un mensaje indicando esto.
     return {
-      Mensaje: 'No se encontraron días disponibles en los próximos 3 días.'
+      Mensaje: 'No se encontraron días disponibles en los próximos 2 días.'
     };
   } catch (error) {
     // Maneja cualquier error que pueda haber ocurrido.
@@ -508,10 +605,11 @@ export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio
 }
 
 
-export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio) => {
+
+export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio, barbero) => {
   try {
     // Primero verifica la disponibilidad del horario solicitado.
-    const horarioAprobado = await verificarDisponibilidad(fecha, horaSolicitada, servicio);
+    const horarioAprobado = await verificarDisponibilidad(fecha, horaSolicitada, servicio, barbero);
     console.log('Horario aprobado:', horarioAprobado);
 
     if (horarioAprobado) {

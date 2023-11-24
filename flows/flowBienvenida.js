@@ -44,6 +44,8 @@ const flowPrincipal = bot
         const myState = state.getMyState();
         console.log(myState.errorHandler)
         if(myState.errorHandler>=3){
+          error = 0
+          await state.update({ errorHandler: error });
           return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }
         return await gotoFlow(flowPrincipal)

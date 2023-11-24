@@ -1,5 +1,5 @@
 import bot from "@bot-whatsapp/bot";
-import flowBarbero from "./flowBarbero.js";
+import flowBusqueda from "./flowBusqueda.js";
 let error = 0
 const flowNombre = bot
 .addKeyword('bot')
@@ -9,7 +9,7 @@ const flowNombre = bot
     async (ctx, {state,gotoFlow }) => {
       console.log(ctx.body)
       await state.update({ nombre: ctx.body });
-      return await gotoFlow(flowBarbero)
+      return await gotoFlow(flowBusqueda)
     }
 )
 export default flowNombre
