@@ -46,7 +46,7 @@ const flowAgendar = bot
           myState.servicio,
           myState.nombre,
           myState.telefono,
-          myState.barberos
+          myState.barbero
         );
         
         console.log('Resultado de agendarTurno:', agendar);

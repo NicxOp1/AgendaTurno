@@ -27,9 +27,9 @@ const flowPrincipal = bot
       if(parseInt(ctx.body)==1){
         await gotoFlow(flowSelecion1)
       }else if(parseInt(ctx.body)==2){
-        await gotoFlow(flowSeleccion2)
+/*         await gotoFlow(flowSeleccion2)
       } else if(parseInt(ctx.body)==3){
-        await gotoFlow(flowSeleccion3)
+        await gotoFlow(flowSeleccion3) */
       }/*else if(parseInt(ctx.body)==4){
         await gotoFlow(flowSeleccion4)
       }else if(parseInt(ctx.body)==5){
