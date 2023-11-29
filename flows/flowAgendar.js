@@ -39,7 +39,7 @@ const flowAgendar = bot
         await state.update({ horario: ctx.body }); 
         await state.update({ telefono: ctx.from });
         const myState = state.getMyState();
-        console.log(myState.horario);
+        console.log(myState.barbero);
         const agendar = await agendarTurno(
           myState.dia,
           myState.horario,
@@ -51,7 +51,11 @@ const flowAgendar = bot
         
         console.log('Resultado de agendarTurno:', agendar);
         if (agendar.Mensaje) {
-          flowDynamic(agendar.Mensaje)           
+          console.log(agendar)
+          flowDynamic(agendar.Mensaje)         
+         }
+        else if(agendar.DiasDisponibles) {
+          flowDynamic("No hemos encontrado un turno disponible...")
           let nuevoDia = '';
           let listadoDeHorarios = '';
           let dia = agendar.DiasDisponibles;
@@ -68,9 +72,6 @@ const flowAgendar = bot
           await state.update({horariosPosibles: listadoDeHorarios});
           await delay(2000)
           return await gotoFlow(flowReagendar)
-        } else {
-          flowDynamic(agendar)
-          return endFlow()
         }
       } else {
         error++

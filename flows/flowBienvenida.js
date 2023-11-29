@@ -5,7 +5,7 @@ import flowSeleccion3 from "./flowSeleccion3.js";
 /* let timeoutId;  */
 let error = 0;
 const flowPrincipal = bot
-  .addKeyword("hola",{sensitive:false})
+  .addKeyword("tonta",{sensitive:false})
   .addAnswer(`💈 ¡Hola! 💈 
   Bienvenido a Barbería Gambino ✂️
   ¿Cómo puedo ayudarte hoy? 
