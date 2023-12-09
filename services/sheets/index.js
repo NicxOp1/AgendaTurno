@@ -91,6 +91,7 @@ export const consultarTurnos = async (telefono) => {
       Servicio: [],
       Cliente: [],
       Telefono: [],
+      Barbero:[]
     };
     const CREDENTIALS ={
       "type": "service_account",
@@ -119,6 +120,7 @@ export const consultarTurnos = async (telefono) => {
         turnos["Servicio"].push(row._rawData[3]);
         turnos["Cliente"].push(row._rawData[4]);
         turnos["Telefono"].push(row._rawData[5]);
+        turnos["Barbero"].push(row._rawData[6]);
       }
     }
 
@@ -127,7 +129,7 @@ export const consultarTurnos = async (telefono) => {
     for (let i = 0; i < turnos.Fecha.length; i++) {
       let fechaTurno = moment(turnos.Fecha[i], 'DD/MM/YY');
       if (fechaTurno.isAfter(moment())) {
-        mensaje += `${i+1}) Para la fecha ${turnos.Fecha[i]} un servicio de *${turnos.Servicio[i]}* a las ${turnos.Inicio[i]} hasta las ${turnos.Finalización[i]},\n`;
+        mensaje += `${i+1}) Para la fecha ${turnos.Fecha[i]} un servicio de *${turnos.Servicio[i]}* a las ${turnos.Inicio[i]} hasta las ${turnos.Finalización[i]} con el barbero **${turnos.Barbero[i]}**,\n`;
         contadorTurnos++;
       }
     }
@@ -294,6 +296,7 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) =
       Barbero: [], 
       HorarioLaboralBarbero: "",
       DiasLaboralesBarbero: "", 
+      Duración: [],
     };
     const CREDENTIALS ={
       "type": "service_account",
@@ -316,9 +319,11 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) =
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index];
       const fechaColumna = row._rawData[0];
-      const servicioColumna = row._rawData[3];
+      if (fecha.startsWith('0')) {
+        fecha = fecha.replace('0', '');
+      }
       const barberoColumna = row._rawData[6]; 
-      if (fechaColumna === fecha && servicioColumna === servicio && barberoColumna === barbero) {
+      if (fechaColumna === fecha && barberoColumna === barbero) {
         turnos["Fecha"].push(row._rawData[0]);
         turnos["Inicio"].push(row._rawData[1]);
         turnos["Finalizacion"].push(row._rawData[2]);
@@ -337,7 +342,7 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) =
       const nombreServicio = row._rawData[0];
       const duracionServicio = row._rawData[1];
       if (nombreServicio === servicio) {
-        turnos["Duración"] = duracionServicio;
+        turnos["Duración"].push(duracionServicio);
         break; // Terminamos la búsqueda una vez que encontramos la duración.
       }
     }
@@ -363,6 +368,7 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) =
     throw error;
   }
 };
+
 
 
 //flow 4
@@ -480,61 +486,48 @@ export const verificarDisponibilidad = async (
 
 export const buscarHorariosDisponibles = async (fecha, servicio, barbero) => {
   try {
-    // Obtiene todos los turnos para la fecha y el servicio dados.
+    console.log("parametros:",fecha,servicio,barbero)
     const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fecha, servicio, barbero);
-
-    // Obtiene la duración del servicio solicitado.
-    const duracionServicio = parseInt(turnosPorDiaYServicio["Duración"].split(":")[0]);
-
-    // Obtiene los días de trabajo del barbero.
-    const diasDeTrabajo = await obtenerDiasDeTrabajo(barbero);
-
-    // Obtiene el horario de trabajo del barbero.
+    console.log("trurnosPorDiayServicio",turnosPorDiaYServicio)
+    const duracionArray = turnosPorDiaYServicio["Duración"][0].split(":");
+    const duracionServicio = parseInt(duracionArray[0]) * 60 + parseInt(duracionArray[1]);
+    
+    console.log("duracionServicio",duracionServicio)
     const horarioLaboralBarbero = turnosPorDiaYServicio["HorarioLaboralBarbero"].split("/");
     let horaInicioJornada = moment(horarioLaboralBarbero[0], 'HH:mm');
+    console.log("horaInicioJor",horaInicioJornada)
     const horaFinJornada = moment(horarioLaboralBarbero[1], 'HH:mm');
 
-    // Inicializa un array para almacenar los horarios disponibles.
     let horariosDisponibles = [];
 
-    // Mientras la hora de inicio de la jornada laboral sea igual o anterior a la hora de finalización...
     while (horaInicioJornada.isSameOrBefore(horaFinJornada)) {
       let disponible = true;
-      const horaFinSolicitada = moment(horaInicioJornada).add(duracionServicio, 'hours');
+      const horaInicioSolicitada = moment(horaInicioJornada);
+      const horaFinSolicitada = moment(horaInicioJornada).add(duracionServicio, 'minutes');
 
-      // Si la hora de finalización del servicio solicitado es posterior a la hora de finalización de la jornada laboral, se rompe el bucle.
       if (horaFinSolicitada.isAfter(horaFinJornada)) {
         break;
       }
-
-      // Para cada turno existente...
       for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
         const horaInicioTurno = moment(turnosPorDiaYServicio["Inicio"][i], "HH:mm");
         const horaFinTurno = moment(turnosPorDiaYServicio["Finalizacion"][i], "HH:mm");
-
-        // Verifica si hay solapamiento de horarios.
         if (
           (horaInicioSolicitada.isSameOrAfter(horaInicioTurno) &&
             horaInicioSolicitada.isBefore(horaFinTurno)) ||
           (horaFinSolicitada.isAfter(horaInicioTurno) && 
             horaFinSolicitada.isSameOrBefore(horaFinTurno)) ||
-          (horaInicioSolicitada.isBefore(horaInicioTurno) && 
-            horaFinSolicitada.isAfter(horaFinTurno)) ||
-          (horaInicioSolicitada.isSameOrAfter(horaInicioTurno) && 
-            horaFinSolicitada.isAfter(horaFinTurno))
+          (horaInicioSolicitada.isSameOrBefore(horaInicioTurno) && 
+            horaFinSolicitada.isSameOrAfter(horaFinTurno))
         ) {
-          // Hay solapamiento, no está disponible.
           disponible = false;
           break;
         }
       }
 
-      // Si el horario solicitado está disponible, se añade al array `horariosDisponibles`.
       if (disponible) {
         horariosDisponibles.push(horaInicioJornada.format('HH:mm'));
       }
 
-      // Incrementa la hora de inicio en incrementos de 30 minutos.
       horaInicioJornada.add(30, 'minutes');
     }
 
@@ -545,9 +538,9 @@ export const buscarHorariosDisponibles = async (fecha, servicio, barbero) => {
   }
 };
 
-
 export const obtenerDiasDeTrabajo = async (barbero) => {
   const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  let diasLaborables = [];
   const CREDENTIALS = {
     "type": "service_account",
     "project_id": "calendar-turnos-400220",
@@ -561,7 +554,6 @@ export const obtenerDiasDeTrabajo = async (barbero) => {
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
     "universe_domain": "googleapis.com"
   }
-  let diasLaborables = [];
   
   // Autenticación y carga de información.
   await doc.useServiceAccountAuth(CREDENTIALS);
@@ -582,8 +574,8 @@ export const obtenerDiasDeTrabajo = async (barbero) => {
       // Si se encuentra el barbero, se procesan sus días de trabajo.
       const diasDeTrabajo = row._rawData[1];
 
-      // Divide los días de trabajo por comas y guiones.
-      const partes = diasDeTrabajo.split(/,|-/);
+      // Divide los días de trabajo por comas.
+      const partes = diasDeTrabajo.split(',');
 
       partes.forEach(parte => {
         parte = parte.trim(); // Elimina los espacios en blanco al principio y al final.
@@ -612,24 +604,22 @@ export const obtenerDiasDeTrabajo = async (barbero) => {
   return diasLaborables;
 };
 
-
 export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio, barbero) => {
   try {
     // Convierte la fecha de inicio al formato de Moment.js.
     let fecha = moment(fechaInicio, 'DD/MM/YY');
-    console.log(barbero)
-    console.log(fecha)
-    console.log("fecha.day",fecha.day())
-
     // Obtiene los días de trabajo del barbero.
     const diasDeTrabajo = await obtenerDiasDeTrabajo(barbero);
     // Verifica la disponibilidad para el día actual y el siguiente.
+    const diasDeTrabajoString = String(diasDeTrabajo);
+    const diasDeTrabajoArray = diasDeTrabajoString.split(',').map(Number);
     for (let i = 0; i < 2; i++) {
       // Verifica si el día es un día de trabajo para el barbero.
-      if (diasDeTrabajo.includes(fecha.day())) {
+      if (diasDeTrabajoArray.includes(fecha.day())) {
+
         // Busca los horarios disponibles para este día.
-        const horariosDisponibles = await buscarHorariosDisponibles(fecha.format('DD/MM/YY'), servicio);
-        
+        const horariosDisponibles = await buscarHorariosDisponibles(fecha.format('DD/MM/YY'), servicio,barbero);
+        console.log(horariosDisponibles);
         if (horariosDisponibles.length > 0) {
           return {
             Fecha: fecha.format('DD/MM/YY'),
@@ -693,19 +683,6 @@ export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, serv
 
 export const cancelarTurnoPorPosicion = async(telefono, posicionTurno)=> {
   // Primero, obtén todos los turnos.
-  let turnos = await consultarTurnos(telefono);
-  let turnera= turnos.turnos
-  // Luego, encuentra el turno que el usuario quiere cancelar.
-  let turnoFecha = turnera.Fecha[posicionTurno-1];
-  let turnoInicio = turnera.Inicio[posicionTurno-1];
-  let turnoBorrado = {
-    dia: turnera.Fecha[posicionTurno-1],
-    horario: turnera.Inicio[posicionTurno-1],
-    servicio: turnera.Servicio[posicionTurno-1],
-    nombre: turnera.Cliente[posicionTurno-1],
-    telefono: turnera.Telefono[posicionTurno-1]
-  }
-
   const CREDENTIALS ={
     "type": "service_account",
     "project_id": "calendar-turnos-400220",
@@ -719,6 +696,20 @@ export const cancelarTurnoPorPosicion = async(telefono, posicionTurno)=> {
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
     "universe_domain": "googleapis.com"
   }    
+  let turnos = await consultarTurnos(telefono);
+  let turnera= turnos.turnos
+  // Luego, encuentra el turno que el usuario quiere cancelar.
+  let turnoFecha = turnera.Fecha[posicionTurno-1];
+  let turnoInicio = turnera.Inicio[posicionTurno-1];
+  let turnoBorrado = {
+    dia: turnera.Fecha[posicionTurno-1],
+    horario: turnera.Inicio[posicionTurno-1],
+    servicio: turnera.Servicio[posicionTurno-1],
+    nombre: turnera.Cliente[posicionTurno-1],
+    telefono: turnera.Telefono[posicionTurno-1],
+    barbero: turnera.Barbero[posicionTurno-1],
+  }
+
   // A continuación, obtén la hoja de cálculo y autentícate.
   await doc.useServiceAccountAuth(CREDENTIALS);
   await doc.loadInfo();
@@ -730,7 +721,7 @@ export const cancelarTurnoPorPosicion = async(telefono, posicionTurno)=> {
   // Busca la fila que corresponde al turno que el usuario quiere cancelar.
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    if (row._rawData[0] === turnoFecha && row._rawData[1] === turnoInicio) {
+    if (row._rawData[0] === turnoFecha && row._rawData[1] === turnoInicio && row._rawData[6] === barbero) {
       // Si encuentras la fila, elimínala.
       await row.delete();
       break;

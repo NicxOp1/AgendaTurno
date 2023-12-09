@@ -3,6 +3,7 @@ import { agendarTurno } from "../services/sheets/index.js";
 import flowCambiarFecha from "./flowCambiarFecha.js";
 import { cleanMessage } from "@whiskeysockets/baileys";
 
+let error=0
 function esHorarioValido(horario) {
   // Dividir la hora y los minutos
   var partes = horario.split(':');
@@ -47,8 +48,9 @@ const flowReagendar = bot
                   myState.servicio,
                   myState.nombre,
                   myState.telefono,
+                  myState.barbero
                 );
-                flowDynamic(agendar);
+                flowDynamic(agendar.Mensaje);
                 return endFlow(); 
             }
           }
@@ -62,11 +64,12 @@ const flowReagendar = bot
                     myState.servicio,
                     myState.nombre,
                     myState.telefono,
+                    myState.barbero
                   );
-                  flowDynamic(agendar);
+                  flowDynamic(agendar.Mensaje);
                   return endFlow(); 
             } 
-             else if(ctx.body == "Cambiar"){
+             else if(ctx.body.toLowerCase() == "cambiar"){
               return await gotoFlow(flowCambiarFecha)
             }else{
               flowDynamic('❌ Parece que hubo un error al ingresar los datos. Por favor, intenta de nuevo.')

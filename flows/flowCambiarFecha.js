@@ -44,11 +44,12 @@ function validarFecha(fechaStr) {
 
 const flowCambiarFecha = bot
 .addKeyword('bot')
-.addAnswer(`Perfecto, Ingrese el dia
+.addAnswer(`Perfecto, Ingrese el dia 📆
 al que quieres cambiar
 Recuerda que debe ser un
 dia futuro al seleccionado previamente
-Recordá el formato DD/MM/AA`,
+Recordá el formato 
+DD/MM/AA Ej: 6/12/23`,
         { capture: true, delay : 2000 },
         async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
             const resultado = validarFecha(ctx.body);  
@@ -71,9 +72,10 @@ Recordá el formato DD/MM/AA`,
                 myState.horario,
                 myState.servicio,
                 myState.nombre,
-                myState.telefono
+                myState.telefono,
+                myState.barbero
              );
-             flowDynamic(agendar);
+             flowDynamic(agendar.Mensaje);
               return endFlow()
             } 
      }

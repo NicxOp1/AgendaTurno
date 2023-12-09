@@ -50,15 +50,16 @@ const flowAgendar = bot
         );
         
         console.log('Resultado de agendarTurno:', agendar);
-        if (agendar.Mensaje) {
+        if (agendar.Mensaje && !agendar.DiasDisponibles.Horarios) {
           console.log(agendar)
           flowDynamic(agendar.Mensaje)         
-         }
-        else if(agendar.DiasDisponibles) {
+        }
+        else if(agendar.DiasDisponibles.Horarios && agendar.DiasDisponibles.Horarios.length > 0) {
           flowDynamic("No hemos encontrado un turno disponible...")
           let nuevoDia = '';
           let listadoDeHorarios = '';
           let dia = agendar.DiasDisponibles;
+          console.log("dia",dia)
           let lista = '';
           dia.Horarios.sort();
           for (let i = 0; i < dia.Horarios.length; i++) {
