@@ -1,7 +1,8 @@
 import bot from "@bot-whatsapp/bot";
-import flowSelecion1 from "./flowSeleccion.js";
+import flowSeleccion1 from "./flowSeleccion.js";
 import flowSeleccion2 from "./flowSeleccion2.js";
 import flowSeleccion3 from "./flowSeleccion3.js";
+import flowSeleccion4 from "./flowSeleccion4.js"
 /* let timeoutId;  */
 let error = 0;
 const flowPrincipal = bot
@@ -25,14 +26,14 @@ const flowPrincipal = bot
     async (ctx,{state,gotoFlow,endFlow,flowDynamic})=> { 
       await state.update({ telefono: ctx.from });
       if(parseInt(ctx.body)==1){
-        await gotoFlow(flowSelecion1)
+        await gotoFlow(flowSeleccion1)
       }else if(parseInt(ctx.body)==2){
          await gotoFlow(flowSeleccion2)
-      /*} else if(parseInt(ctx.body)==3){
-        await gotoFlow(flowSeleccion3) */
+      } else if(parseInt(ctx.body)==3){
+        await gotoFlow(flowSeleccion3) 
       }/*else if(parseInt(ctx.body)==4){
         await gotoFlow(flowSeleccion4)
-      }else if(parseInt(ctx.body)==5){
+      }/*else if(parseInt(ctx.body)==5){
         await gotoFlow(flowSeleccion5)
       } */
       if(ctx.body.toLowerCase()=="cancelar"){

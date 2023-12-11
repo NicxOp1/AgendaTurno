@@ -1,7 +1,7 @@
  import bot from "@bot-whatsapp/bot";
 import {consultarTurnos} from '../services/sheets/index.js'
 import flowSeleccionarTurnoPBorrar from './flowSeleccionarTurnoPBorrar.js'
-const flowSelecion3 = bot
+const flowSeleccion3 = bot
 .addKeyword("bot")
 .addAnswer(
    `Perfecto aquí se encuentran tus turnos ya agendados..
@@ -20,9 +20,8 @@ Recuerda siempre que quieras salir escribe *Cancelar*`,
       await flowDynamic(mensaje.mensaje)
       return gotoFlow(flowSeleccionarTurnoPBorrar)
     }else{
-      flowDynamic("no tienes ningun turno agendado.!")
-      return endFlow()
+      return endFlow({body: 'Lo siento😔, no tienes ningún turno agendado!   Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
     }
   }
 )
-export default flowSelecion3
+export default flowSeleccion3

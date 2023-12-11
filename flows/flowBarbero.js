@@ -18,7 +18,7 @@ const flowBarbero = bot
                 let barberos = await getBarberosDisponibles(dia)
                 let barberosEnumerados = barberos.map((barbero, index) => `${index + 1}. ${barbero}`).join('\n');
                 await state.update({ barberos: barberos });
-                await flowDynamic(`Los barberos que hay disponibles son:\n${barberosEnumerados}`)
+                await flowDynamic(`Los barberos que hay disponibles son: \n${barberosEnumerados}`)
                 return await gotoFlow(flowSeleccionBarbero)
             }else if (ctx.body.toLowerCase()=="no"){
                 const myState = state.getMyState();

@@ -41,7 +41,7 @@ function validarFecha(fechaStr) {
     return { valido: true, log: "Fecha válida." };
 }
 
-const flowSelecion4 = bot
+const flowSeleccion4 = bot
 .addKeyword("bot")
 .addAction(
     null,
@@ -79,9 +79,10 @@ const flowSelecion4 = bot
               await state.update({ errorHandler: error });
               return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
             }
-            return await flowDynamic(validacion.log)
+            await flowDynamic(validacion.log)
+            return await gotoFlow(flowSeleccion4)
         }
     }
   }
 )
-export default flowSelecion4
+export default flowSeleccion4

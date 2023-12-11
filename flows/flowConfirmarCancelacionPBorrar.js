@@ -1,6 +1,6 @@
 import bot from "@bot-whatsapp/bot";
 import {cancelarTurnoPorPosicion} from "../services/sheets/index.js"
-import flowSeleccionarTurnoPBorrar from "./flowSeleccionarTurnoPBorrar.js";
+import flowSeleccion3 from "./flowSeleccion3.js"
 
 let error = 0
 
@@ -20,20 +20,12 @@ const flowConfirmarCancelacionPBorrar = bot
       let turnoCancelado = await cancelarTurnoPorPosicion(myState.telefono,myState.numeroTurno);
       console.log(turnoCancelado)
       if(turnoCancelado){
-         await flowDynamic(`El turno del dia ${turnoCancelado.dia} a las ${turnoCancelado.horario} se encuentra cancelado `);
+         await flowDynamic(`El turno del dia ${turnoCancelado.dia} a las ${turnoCancelado.horario} con el barbero *${turnoCancelado.barbero}* se encuentra ❌ *CANCELADO* ❌ `);
          return endFlow()
       }
     } else if (confirmacion === 'no') {
       // Si el usuario no confirma, vuelve al flujo de selección de turno.
-      error++
-      await state.update({ errorHandler: error });
-      const myState = state.getMyState();
-      if(myState.errorHandler>=3){
-        error = 0
-        await state.update({ errorHandler: error });
-        return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-      }
-      return await gotoFlow(flowSeleccionarTurnoPBorrar);
+      return await gotoFlow(flowSeleccion3);
     } else {
       error++
       await state.update({ errorHandler: error });
@@ -44,6 +36,7 @@ const flowConfirmarCancelacionPBorrar = bot
         return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
       }
       // Si el usuario introduce algo distinto de sí o no, pide una nueva confirmación.
+      await flowDynamic("Lo siento😔, te has equivocado... Porfavor volvé a intentarlo")
       return gotoFlow(flowConfirmarCancelacionPBorrar);
     }
   }

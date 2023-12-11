@@ -1,6 +1,6 @@
 import bot from "@bot-whatsapp/bot";
 import delay from "../app.js";
-import flowSelecion4 from "./flowSeleccion4.js";
+import flowSeleccion4 from "./flowSeleccion4.js";
 import flowBarbero from "./flowBarbero.js";
 let error = 0;
 const flowBusqueda = bot
@@ -15,44 +15,39 @@ const flowBusqueda = bot
     ],
     { capture: true, delay: 2000 },
     async (ctx, { flowDynamic, state, gotoFlow }) => {
-      if (ctx.body === "A") {
+      if (ctx.body.toLowerCase() === "a") {
         const myState = state.getMyState();
         const ServicioSeleccionado = "Corte";
         await state.update({ servicio: ServicioSeleccionado });
         if (myState.Consulta) {
-          return await gotoFlow(flowSelecion4);
+          return await gotoFlow(flowSeleccion4);
         }
         await gotoFlow(flowBarbero);
-        flowDynamic();
-      } else if (ctx.body === "B") {
+      } else if (ctx.body.toLowerCase() === "b") {
         const myState = state.getMyState();
         const ServicioSeleccionado = "Corte y Barba";
         await state.update({ servicio: ServicioSeleccionado });
         if (myState.Consulta) {
-          return await gotoFlow(flowSelecion4);
+          return await gotoFlow(flowSeleccion4);
         }
         await gotoFlow(flowBarbero);
-        flowDynamic();
-      } else if (ctx.body === "C") {
+      } else if (ctx.body.toLowerCase() === "c") {
         const myState = state.getMyState();
 
         const ServicioSeleccionado = "Color";
         await state.update({ servicio: ServicioSeleccionado });
         if (myState.Consulta) {
-          return await gotoFlow(flowSelecion4);
+          return await gotoFlow(flowSeleccion4);
         }
         await gotoFlow(flowBarbero);
-        flowDynamic();
-      } else if (ctx.body === "D") {
+      } else if (ctx.body.toLowerCase() === "d") {
         const myState = state.getMyState();
-
         const ServicioSeleccionado = "Barba";
         await state.update({ servicio: ServicioSeleccionado });
         if (myState.Consulta) {
-          return await gotoFlow(flowSelecion4);
+          return await gotoFlow(flowSeleccion4);
         }
         await gotoFlow(flowBarbero);
-        flowDynamic();
       } else {
         await delay(2000);
         await flowDynamic(

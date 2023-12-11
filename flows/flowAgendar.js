@@ -55,7 +55,7 @@ const flowAgendar = bot
           flowDynamic(agendar.Mensaje)         
         }
         else if(agendar.DiasDisponibles.Horarios && agendar.DiasDisponibles.Horarios.length > 0) {
-          flowDynamic("No hemos encontrado un turno disponible...")
+          flowDynamic("Lo siento😞, no hemos encontrado un turno disponible...")
           let nuevoDia = '';
           let listadoDeHorarios = '';
           let dia = agendar.DiasDisponibles;

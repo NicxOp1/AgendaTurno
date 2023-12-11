@@ -63,8 +63,7 @@ Recuerda siempre que quieras salir escribe *Cancelar*`,
       await flowDynamic(mensaje.mensaje)
       return gotoFlow(flowSeleccionarTurno)
     }else{
-      flowDynamic("no tienes ningun turno agendado.!")
-      return endFlow()
+      return endFlow({body: 'Lo siento😔, no tienes ningún turno agendado!   Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
     }
   }
 )

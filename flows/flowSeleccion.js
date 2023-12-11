@@ -44,7 +44,7 @@ function validarFecha(fechaStr) {
   return { valido: true, log: "Fecha válida." };
 }
 
-const flowSelecion1 = bot
+const flowSeleccion1 = bot
   .addKeyword("bot") //Reservar un turno
   .addAnswer(
     "📆 Por favor, ingresa la fecha en la que deseas atenderte. Recuerda usar el formato DD/MM/AA.",
@@ -66,7 +66,7 @@ const flowSelecion1 = bot
           await state.update({ errorHandler: error });
           return endFlow({body: '⚠️ Has superado los 3 intentos. Por favor, escribe *Hola* para comenzar de nuevo. ¡Gracias!'})
         }
-        return gotoFlow(flowSelecion1);
+        return gotoFlow(flowSeleccion1);
       } else {
         await state.update({ dia: ctx.body });
         return await gotoFlow(flowNombre);
@@ -75,5 +75,5 @@ const flowSelecion1 = bot
   )
 
 
-export default flowSelecion1
+export default flowSeleccion1
 

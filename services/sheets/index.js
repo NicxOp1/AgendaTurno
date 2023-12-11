@@ -372,10 +372,10 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) =
 
 
 //flow 4
-export const buscarTurnosDisponibles = async (fecha, servicio) => {
+export const buscarTurnosDisponibles = async (fecha, servicio,barbero) => {
   try {
     // Obtenemos los turnos ya agendados para el día y servicio especificados.
-    let turnosAgendados = await consultarTurnosPorDiaYServicio(fecha, servicio);
+    let turnosAgendados = await consultarTurnosPorDiaYServicio(fecha, servicio,barbero);
 
     // Definimos el horario laboral.
     let inicioJornada = 10 * 60; // 10:00 en minutos desde la medianoche.
@@ -701,6 +701,7 @@ export const cancelarTurnoPorPosicion = async(telefono, posicionTurno)=> {
   // Luego, encuentra el turno que el usuario quiere cancelar.
   let turnoFecha = turnera.Fecha[posicionTurno-1];
   let turnoInicio = turnera.Inicio[posicionTurno-1];
+  let barbero = turnera.Barbero[posicionTurno-1];
   let turnoBorrado = {
     dia: turnera.Fecha[posicionTurno-1],
     horario: turnera.Inicio[posicionTurno-1],

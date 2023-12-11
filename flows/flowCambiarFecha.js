@@ -1,6 +1,7 @@
 import bot from "@bot-whatsapp/bot";
 import { agendarTurno } from "../services/sheets/index.js";
-import flowSelecion1 from "./flowSeleccion.js";
+import flowSeleccion1 from "./flowSeleccion.js";
+import flowAgendar from "./flowAgendar.js";
  
 let error = 0
 const errorMessages = {
@@ -63,20 +64,10 @@ DD/MM/AA Ej: 6/12/23`,
                 await state.update({ errorHandler: error });
                 return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
               }
-              return await gotoFlow(flowSelecion1); 
+              return await gotoFlow(flowSeleccion1); 
             } else {
               await state.update({ dia: ctx.body });
-              const myState = state.getMyState();
-              const agendar = await agendarTurno(
-                myState.dia,
-                myState.horario,
-                myState.servicio,
-                myState.nombre,
-                myState.telefono,
-                myState.barbero
-             );
-             flowDynamic(agendar.Mensaje);
-              return endFlow()
+              return await gotoFlow(flowAgendar)
             } 
      }
 )

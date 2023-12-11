@@ -23,7 +23,8 @@ const flowConfirmarCancelacion = bot
         dia: turnoCancelado.dia,
         servicio: turnoCancelado.servicio,
         nombre: turnoCancelado.nombre,
-        telefono: turnoCancelado.telefono
+        telefono: turnoCancelado.telefono,
+        barbero: turnoCancelado.barbero,
       });
       return await gotoFlow(flowReagendar);
     } else if (confirmacion === 'no') {
