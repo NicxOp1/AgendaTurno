@@ -82,6 +82,83 @@ const doc = new GoogleSpreadsheet(
     }
 };
   
+export const consultarServicios = async () => {
+  try {
+    let servicios = {
+      Servicio: [],
+      ValorEfectivo: [],
+      ValorTarjeta: []
+    };
+    const CREDENTIALS ={
+      "type": "service_account",
+      "project_id": "calendar-turnos-400220",
+      "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+      "client_id": "107884470593691798095",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+      "universe_domain": "googleapis.com"
+    }    
+    await doc.useServiceAccountAuth(CREDENTIALS);
+    await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
+    let sheet = doc.sheetsByTitle["Hoja 2"]; // Cambiamos a "Hoja 2"
+    let rows = await sheet.getRows();
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      servicios["Servicio"].push(row._rawData[0]);
+      servicios["ValorEfectivo"].push(row._rawData[2]);
+      servicios["ValorTarjeta"].push(row._rawData[3]);
+    }
+
+    console.log('Servicios consultados:', servicios);
+    return servicios;
+  } catch (error) {
+    console.error('Ocurrió un error al consultar los servicios:', error);
+    throw error;
+  }
+};
+
+export const consultarProductos = async () => {
+  try {
+    let productos = {
+      Producto: [],
+      ValorEfectivo: [],
+      ValorTarjeta: []
+    };
+    const CREDENTIALS ={
+      "type": "service_account",
+      "project_id": "calendar-turnos-400220",
+      "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+      "client_id": "107884470593691798095",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+      "universe_domain": "googleapis.com"
+    }    
+    await doc.useServiceAccountAuth(CREDENTIALS);
+    await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
+    let sheet = doc.sheetsByTitle["Hoja 4"]; // Cambiamos a "Hoja 2"
+    let rows = await sheet.getRows();
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      productos["Producto"].push(row._rawData[0]);
+      productos["ValorEfectivo"].push(row._rawData[1]);
+      productos["ValorTarjeta"].push(row._rawData[2]);
+    }
+
+    console.log('Productos consultados:', productos);
+    return productos;
+  } catch (error) {
+    console.error('Ocurrió un error al consultar los productos:', error);
+    throw error;
+  }
+};
 export const consultarTurnos = async (telefono) => {
   try {
     let turnos = {
@@ -740,5 +817,7 @@ export default {
   verificarYBuscarDisponibilidad,
   buscarHorariosDisponibles,
   buscarProximoDiaYHorariosDisponibles,
-  cancelarTurnoPorPosicion
+  cancelarTurnoPorPosicion,
+  consultarServicios,
+  consultarProductos
 };  

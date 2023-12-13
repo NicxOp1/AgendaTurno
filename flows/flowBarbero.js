@@ -24,7 +24,8 @@ const flowBarbero = bot
                 const myState = state.getMyState();
                 let dia = myState.dia
                 let barberos = await getBarberosDisponibles(dia)
-                let barberoRandom = barberos[Math.floor(Math.random() * barberos.length)];
+                let random = Math.floor(Math.random() * barberos.length)
+                let barberoRandom = barberos[random]
                 await state.update({ barberos: barberoRandom });
                 console.log(barberoRandom)
 

@@ -25,6 +25,6 @@
         "node": "^21.1.0",
         "openai": "^3.3.0"
     },
-    "author": "",
+    "author": "Nicolas Gonzalo Lopez @2023",
     "license": "ISC"
 }
