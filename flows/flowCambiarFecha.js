@@ -23,7 +23,7 @@ function validarFecha(fechaStr) {
   let hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  if (fecha <= hoy) {
+  if (fecha < hoy) {
     return { valido: false, log: errorMessages.notFutureDate };
   }
 
