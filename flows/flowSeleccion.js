@@ -7,11 +7,12 @@ import moment from "moment";
 const {EVENTS} = pkg; */
 let error = 0;
 const errorMessages = {
-  invalidFormat: "Formato de fecha incorrecto.",
-  notFutureDate: "La fecha debe ser futura.",
-  notValidDay: "La fecha no puede ser ni lunes ni domingo.",
-  tooFarFuture: "La fecha no puede excederse a más de 3 meses de la fecha actual."
+  invalidFormat: "❌ Formato de fecha incorrecto.",
+  notFutureDate: "🔮 La fecha debe ser futura.",
+  notValidDay: "🚫 La fecha no puede ser ni lunes ni domingo.",
+  tooFarFuture: "📆 La fecha no puede excederse a más de 3 meses de la fecha actual."
 };
+
 
 function validarFecha(fechaStr) {
   console.log(fechaStr)
