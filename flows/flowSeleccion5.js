@@ -34,10 +34,10 @@ const flowSeleccion5 = bot
           }
             return endFlow() 
       } else if(parseInt(ctx.body)==3){
-        await flowDynamic("Te recomendamos , que a la hora de hacerte un 🌈 _*color*_ 🌈, 2 dias previos al teñido, no te laves la cabeza para poder crear una capa protectora que cubra el cuero cabelludo. Además que tengas el pelo bien hidratado los dias antes y despues del tinte. Puedes utilizar baños de crema o mascarillas para el pelo")
+        await flowDynamic("Te recomendamos , que a la hora de hacerte un 🌈 _*color*_ , 2 dias previos al teñido, no te laves la cabeza para poder crear una capa protectora que cubra el cuero cabelludo. Además que tengas el pelo bien hidratado los dias antes y despues del tinte. Puedes utilizar baños de crema o mascarillas para el pelo")
         return endFlow()
       }else if(parseInt(ctx.body)==4){
-        await flowDynamic("Te recomendamos , que a la hora de hacerte un 💇🏻‍♂️ _*corte*_ 💇🏻‍♂️, mostrar como te peinas todos los dias, si utilizás algun producto para modelarlo y con que largo te sentís comodo (Algo que puede ayudar tambien es decir hace cuanto no te cortás)")
+        await flowDynamic("Te recomendamos , que a la hora de hacerte un 💇🏻‍♂️ _*corte*_ , mostrar como te peinas todos los dias, si utilizás algun producto para modelarlo y con que largo te sentís comodo (Algo que puede ayudar tambien es decir hace cuanto no te cortás)")
         return endFlow()
       }
       if(ctx.body.toLowerCase()=="cancelar"){
