@@ -52,7 +52,8 @@ const flowAgendar = bot
         console.log('Resultado de agendarTurno:', agendar);
         if (agendar.Mensaje && !agendar.DiasDisponibles.Horarios) {
           console.log(agendar)
-          flowDynamic(agendar.Mensaje)         
+          flowDynamic(agendar.Mensaje)  
+          return endFlow();        
         }
         else if(agendar.DiasDisponibles.Horarios && agendar.DiasDisponibles.Horarios.length > 0) {
           flowDynamic("Lo siento😞, no hemos encontrado un turno disponible...")
