@@ -2,6 +2,7 @@ import bot from "@bot-whatsapp/bot";
 import {buscarTurnosDisponibles, consultarTurnos, consultarTurnosPorDiaYServicio} from '../services/sheets/index.js'
 import flowBusqueda from "./flowBusqueda.js";
 
+let error = 0
 const errorMessages = {
     invalidFormat: "❌ Formato de fecha incorrecto.",
     notFutureDate: "🔮 La fecha debe ser futura.",
@@ -21,7 +22,7 @@ function validarFecha(fechaStr) {
     let hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    if (fecha <= hoy) {
+    if (fecha < hoy) {
       return { valido: false, log: errorMessages.notFutureDate };
     }
 
@@ -40,8 +41,8 @@ function validarFecha(fechaStr) {
     return { valido: true, log: "Fecha válida." };
 }
 
-const flowSelecion4 = bot
-.addKeyword("4",{ sensitive: true })
+const flowSeleccion4 = bot
+.addKeyword("bot")
 .addAction(
     null,
    { capture : false},
@@ -70,9 +71,18 @@ const flowSelecion4 = bot
             let consulta = await buscarTurnosDisponibles(ctx.body,myState.servicio)
             return await flowDynamic(`📆 Los turnos disponibles para la fecha solicitada son: ${consulta}`)
         } else {
-            return await flowDynamic(validacion.log)
+            error++
+            await state.update({ errorHandler: error });
+            const myState = state.getMyState();
+            if(myState.errorHandler>=3){
+              error = 0
+              await state.update({ errorHandler: error });
+              return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+            }
+            await flowDynamic(validacion.log)
+            return await gotoFlow(flowSeleccion4)
         }
     }
   }
 )
-export default flowSelecion4
+export default flowSeleccion4

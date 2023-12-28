@@ -9,11 +9,156 @@ const serviceAccountAuth = new JWT({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 const doc = new GoogleSpreadsheet(
-  "1MFSLDq62rA7gHQtIuDAcFwm5R91yyKrECLelh7mPWnc",
+  "17Z4N0Njas3Py95x2Y4SPCh94WBH5h6tQUPsyx2_3lts",
   serviceAccountAuth
-);
+  );
 
+  export const getBarberosDisponibles = async (diaMoment) => {
+    try {
+      const CREDENTIALS ={
+        "type": "service_account",
+        "project_id": "calendar-turnos-400220",
+        "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+        "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+        "client_id": "107884470593691798095",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+        "universe_domain": "googleapis.com"
+      } 
+      const diasDeLaSemana = {
+        'lunes': 1,
+        'martes': 2,
+        'miércoles': 3,
+        'jueves': 4,
+        'viernes': 5,
+        'sábado': 6,
+        'domingo': 0
+      };
+  
+      let dia = moment(diaMoment, 'DD/MM/YY');
+      let diaDeLaSemana = dia.day();  // Obtiene el día de la semana como un número (0-6).
+      let barberosDisponibles = [];
+  
+      await doc.useServiceAccountAuth(CREDENTIALS);
+      await doc.loadInfo();
+      let sheet = doc.sheetsByTitle["Hoja 3"];  // Asume que 'Hoja 3' es la hoja de los barberos.
+      let rows = await sheet.getRows();
+  
+      for (let index = 0; index < rows.length; index++) {
+        const row = rows[index];
+        if (row._rawData[1]) {  // Comprueba si row._rawData[1] existe antes de intentar llamar a split().
+          let diasDeTrabajo = row._rawData[1].toLowerCase();
+  
+          if (diasDeTrabajo.includes('-')) {
+            // Si hay un guión, asumimos que es un rango de días.
+            let rangoDias = diasDeTrabajo.split('-');
+            let inicioSemana = diasDeLaSemana[rangoDias[0]];  // Inicio del rango.
+            let finSemana = diasDeLaSemana[rangoDias[1]];  // Fin del rango.
+  
+            if (inicioSemana <= diaDeLaSemana && diaDeLaSemana <= finSemana) {
+              // Si el día está dentro del rango, añadimos el barbero a la lista de disponibles.
+              barberosDisponibles.push(row._rawData[0]);
+            }
+          } else if (diasDeTrabajo.includes(',')) {
+            // Si hay una coma, asumimos que son días individuales.
+            let diasIndividuales = diasDeTrabajo.split(',').map(dia => diasDeLaSemana[dia]);
+  
+            if (diasIndividuales.includes(diaDeLaSemana)) {
+              // Si el día está en la lista, añadimos el barbero a la lista de disponibles.
+              barberosDisponibles.push(row._rawData[0]);
+            }
+          }
+        }
+      }
+  
+      console.log('Barberos disponibles:', barberosDisponibles);
+      return barberosDisponibles;
+    } catch (error) {
+      console.error('Ocurrió un error al consultar los barberos:', error);
+      throw error;
+    }
+};
+  
+export const consultarServicios = async () => {
+  try {
+    let servicios = {
+      Servicio: [],
+      ValorEfectivo: [],
+      ValorTarjeta: []
+    };
+    const CREDENTIALS ={
+      "type": "service_account",
+      "project_id": "calendar-turnos-400220",
+      "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+      "client_id": "107884470593691798095",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+      "universe_domain": "googleapis.com"
+    }    
+    await doc.useServiceAccountAuth(CREDENTIALS);
+    await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
+    let sheet = doc.sheetsByTitle["Hoja 2"]; // Cambiamos a "Hoja 2"
+    let rows = await sheet.getRows();
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      servicios["Servicio"].push(row._rawData[0]);
+      servicios["ValorEfectivo"].push(row._rawData[2]);
+      servicios["ValorTarjeta"].push(row._rawData[3]);
+    }
 
+    console.log('Servicios consultados:', servicios);
+    return servicios;
+  } catch (error) {
+    console.error('Ocurrió un error al consultar los servicios:', error);
+    throw error;
+  }
+};
+
+export const consultarProductos = async () => {
+  try {
+    let productos = {
+      Producto: [],
+      ValorEfectivo: [],
+      ValorTarjeta: []
+    };
+    const CREDENTIALS ={
+      "type": "service_account",
+      "project_id": "calendar-turnos-400220",
+      "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+      "client_id": "107884470593691798095",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+      "universe_domain": "googleapis.com"
+    }    
+    await doc.useServiceAccountAuth(CREDENTIALS);
+    await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
+    let sheet = doc.sheetsByTitle["Hoja 4"]; // Cambiamos a "Hoja 2"
+    let rows = await sheet.getRows();
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      productos["Producto"].push(row._rawData[0]);
+      productos["ValorEfectivo"].push(row._rawData[1]);
+      productos["ValorTarjeta"].push(row._rawData[2]);
+    }
+
+    console.log('Productos consultados:', productos);
+    return productos;
+  } catch (error) {
+    console.error('Ocurrió un error al consultar los productos:', error);
+    throw error;
+  }
+};
 export const consultarTurnos = async (telefono) => {
   try {
     let turnos = {
@@ -23,20 +168,21 @@ export const consultarTurnos = async (telefono) => {
       Servicio: [],
       Cliente: [],
       Telefono: [],
+      Barbero:[]
     };
-    const CREDENTIALS = {
-      type: "service_account",
-      project_id: process.env.PROJECT_ID,
-      private_key_id: process.env.PRIVATE_KEY_ID,
-      private_key:process.env.PRIVATE_KEY,
-      client_email:process.env.CLIENT_EMAIL,
-      client_id:process.env.CLIENT_ID,
-      auth_uri:process.env.AUTH_URI,
-      token_uri:process.env.TOKEN_URI,
-      auth_provider_x509_cert_url:process.env.AUTH_PROVIDER_X509_CERT_URL,
-      client_x509_cert_url:process.env.CLIENT_X509_CERT_URL,
-      universe_domain: process.env.UNIVERSITY_DOMAIN,
-    };
+    const CREDENTIALS ={
+      "type": "service_account",
+      "project_id": "calendar-turnos-400220",
+      "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+      "client_id": "107884470593691798095",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+      "universe_domain": "googleapis.com"
+    }    
     await doc.useServiceAccountAuth(CREDENTIALS);
     await doc.loadInfo(); // Asumiendo que 'doc' está definido y representa la hoja de cálculo.
     let sheet = doc.sheetsByTitle["Hoja 1"];
@@ -51,6 +197,7 @@ export const consultarTurnos = async (telefono) => {
         turnos["Servicio"].push(row._rawData[3]);
         turnos["Cliente"].push(row._rawData[4]);
         turnos["Telefono"].push(row._rawData[5]);
+        turnos["Barbero"].push(row._rawData[6]);
       }
     }
 
@@ -59,7 +206,7 @@ export const consultarTurnos = async (telefono) => {
     for (let i = 0; i < turnos.Fecha.length; i++) {
       let fechaTurno = moment(turnos.Fecha[i], 'DD/MM/YY');
       if (fechaTurno.isAfter(moment())) {
-        mensaje += `${i+1}) Para la fecha ${turnos.Fecha[i]} un servicio de *${turnos.Servicio[i]}* a las ${turnos.Inicio[i]} hasta las ${turnos.Finalización[i]},\n`;
+        mensaje += `${i+1}) Para la fecha ${turnos.Fecha[i]} un servicio de *${turnos.Servicio[i]}* a las ${turnos.Inicio[i]} hasta las ${turnos.Finalización[i]} con el barbero **${turnos.Barbero[i]}**,\n`;
         contadorTurnos++;
       }
     }
@@ -81,24 +228,27 @@ export const agendarTurno = async (
   horaSolicitada,
   servicio,
   cliente,
-  telefono
+  telefono,
+  barbero
 ) => {
   try {
     // 1. Verificar si ya existe un turno con el mismo número de teléfono.
-    // o generar una funcion en el excel para que la fecha anterior al dia actual borre el turno o
-    //generar dentro de consultar turnos una funcion para que mire explicitamente los turnos del dia o de los dias siguientes 
     const turnosExistentes = await consultarTurnos(telefono);
     console.log('Turnos existentes:', turnosExistentes.contadorTurnos);
     if (turnosExistentes.length > 3) {
       console.log('Ya existe un turno para este número de teléfono.');
-      return "Ya tienes un turno agendado. No se puede agendar otro.";
+      return {
+        Mensaje: "Ya tienes un turno agendado. No se puede agendar otro.",
+        DiasDisponibles: []
+      };
     }
 
     // 2. Verificar disponibilidad en la fecha y hora solicitadas.
     const disponibilidad = await verificarYBuscarDisponibilidad(
       fecha,
       horaSolicitada,
-      servicio
+      servicio,
+      barbero
     );
     console.log('Disponibilidad:', disponibilidad);
     if (!disponibilidad.HorarioAprobado) {
@@ -108,12 +258,20 @@ export const agendarTurno = async (
           Mensaje: "El horario solicitado no está disponible. Aquí están los próximos días y horarios disponibles:",
           DiasDisponibles: disponibilidad.DiasDisponibles
         };
-      } 
+      } else {
+        return {
+          Mensaje: disponibilidad.Mensaje,
+          DiasDisponibles: []
+        };
+      }
     } else {
       console.log("Turno a punto de agendarse...");
-      let devolucion = await agregarTurno(fecha, horaSolicitada, servicio, cliente, telefono);
+      let devolucion = await agregarTurno(fecha, horaSolicitada, servicio, cliente, telefono,barbero);
       console.log('Devolución de agregarTurno:', devolucion);
-      return devolucion;
+      return {
+        Mensaje: devolucion,
+        DiasDisponibles: []
+      };
     }
   } catch (error) {
     console.error('Ocurrió un error al agendar el turno:', error);
@@ -126,22 +284,23 @@ export const agregarTurno = async (
   horaInicio,
   servicio,
   cliente,
-  telefono
+  telefono,
+  barbero
   ) => {
     try {
-      const CREDENTIALS = {
-        type: "service_account",
-        project_id: process.env.PROJECT_ID,
-        private_key_id: process.env.PRIVATE_KEY_ID,
-        private_key:process.env.PRIVATE_KEY,
-        client_email:process.env.CLIENT_EMAIL,
-        client_id:process.env.CLIENT_ID,
-        auth_uri:process.env.AUTH_URI,
-        token_uri:process.env.TOKEN_URI,
-        auth_provider_x509_cert_url:process.env.AUTH_PROVIDER_X509_CERT_URL,
-        client_x509_cert_url:process.env.CLIENT_X509_CERT_URL,
-        universe_domain: process.env.UNIVERSITY_DOMAIN,
-      };
+      const CREDENTIALS ={
+        "type": "service_account",
+        "project_id": "calendar-turnos-400220",
+        "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+        "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+        "client_id": "107884470593691798095",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+        "universe_domain": "googleapis.com"
+      }    
     await doc.useServiceAccountAuth(CREDENTIALS);
     await doc.loadInfo();
 
@@ -181,6 +340,7 @@ export const agregarTurno = async (
       Servicio: servicio,
       Cliente: cliente,
       Telefono: telefono,
+      Barbero: barbero
     };
     
     await doc.useServiceAccountAuth(CREDENTIALS);
@@ -194,14 +354,14 @@ export const agregarTurno = async (
 
     console.log('Turno agendado con éxito');
     
-    return `¡Perfecto! ${cliente}, tu turno ya fue agendado. Iniciará a las ${horaInicio} y finalizará a las ${horaFinalizacion}. ¡Gracias por elegirnos! 😊👍`;
+    return `¡Perfecto! ${cliente}, tu turno ya fue agendado. Con el barbero ${barbero} , iniciará a las ${horaInicio} y finalizará a las ${horaFinalizacion}. ¡Gracias por elegirnos! 😊👍`;
   } catch (error) {
     console.error('Ocurrió un error al agregar el turno:', error);
     throw error;
   }
 };
 
-export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
+export const consultarTurnosPorDiaYServicio = async (fecha, servicio, barbero) => {
   try {
     let turnos = {
       Fecha: [],
@@ -210,21 +370,24 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
       Servicio: [],
       Cliente: [],
       Telefono: [],
-      Duración: [], // Agregamos una nueva clave para almacenar la duración del servicio.
+      Barbero: [], 
+      HorarioLaboralBarbero: "",
+      DiasLaboralesBarbero: "", 
+      Duración: [],
     };
-    const CREDENTIALS = {
-      type: "service_account",
-      project_id: process.env.PROJECT_ID,
-      private_key_id: process.env.PRIVATE_KEY_ID,
-      private_key:process.env.PRIVATE_KEY,
-      client_email:process.env.CLIENT_EMAIL,
-      client_id:process.env.CLIENT_ID,
-      auth_uri:process.env.AUTH_URI,
-      token_uri:process.env.TOKEN_URI,
-      auth_provider_x509_cert_url:process.env.AUTH_PROVIDER_X509_CERT_URL,
-      client_x509_cert_url:process.env.CLIENT_X509_CERT_URL,
-      universe_domain: process.env.UNIVERSITY_DOMAIN,
-    };
+    const CREDENTIALS ={
+      "type": "service_account",
+      "project_id": "calendar-turnos-400220",
+      "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+      "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+      "client_id": "107884470593691798095",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+      "universe_domain": "googleapis.com"
+    } 
     await doc.useServiceAccountAuth(CREDENTIALS);
     await doc.loadInfo();
     let sheet = doc.sheetsByTitle["Hoja 1"];
@@ -233,17 +396,20 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index];
       const fechaColumna = row._rawData[0];
-      const servicioColumna = row._rawData[3];
-      if (fechaColumna === fecha && servicioColumna === servicio) {
+      if (fecha.startsWith('0')) {
+        fecha = fecha.replace('0', '');
+      }
+      const barberoColumna = row._rawData[6]; 
+      if (fechaColumna === fecha && barberoColumna === barbero) {
         turnos["Fecha"].push(row._rawData[0]);
         turnos["Inicio"].push(row._rawData[1]);
         turnos["Finalizacion"].push(row._rawData[2]);
         turnos["Servicio"].push(row._rawData[3]);
         turnos["Cliente"].push(row._rawData[4]);
         turnos["Telefono"].push(row._rawData[5]);
+        turnos["Barbero"].push(row._rawData[6]);
       }
     }
-    console.log('Turnos obtenidos:', turnos);
 
     // Ahora, vamos a cargar la información de duración desde 'Hoja 2'.
     sheet = doc.sheetsByTitle["Hoja 2"];
@@ -253,9 +419,23 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
       const nombreServicio = row._rawData[0];
       const duracionServicio = row._rawData[1];
       if (nombreServicio === servicio) {
-        turnos["Duración"] = duracionServicio;
-        console.log('Duración del servicio obtenida:', duracionServicio);
+        turnos["Duración"].push(duracionServicio);
         break; // Terminamos la búsqueda una vez que encontramos la duración.
+      }
+    }
+
+    // Ahora, vamos a cargar la información del horario laboral del barbero desde 'Hoja 3'.
+    sheet = doc.sheetsByTitle["Hoja 3"];
+    rows = await sheet.getRows();
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      const nombreBarbero = row._rawData[0];
+      const diasDeTrabajo = row._rawData[1];
+      const horarioLaboral = row._rawData[2];
+      if (nombreBarbero === barbero) {
+        turnos["DiasLaboralesBarbero"]= diasDeTrabajo;
+        turnos["HorarioLaboralBarbero"] = horarioLaboral; // Agregado aquí
+        break; // Terminamos la búsqueda una vez que encontramos el horario laboral.
       }
     }
 
@@ -266,10 +446,13 @@ export const consultarTurnosPorDiaYServicio = async (fecha, servicio) => {
   }
 };
 
-export const buscarTurnosDisponibles = async (fecha, servicio) => {
+
+
+//flow 4
+export const buscarTurnosDisponibles = async (fecha, servicio,barbero) => {
   try {
     // Obtenemos los turnos ya agendados para el día y servicio especificados.
-    let turnosAgendados = await consultarTurnosPorDiaYServicio(fecha, servicio);
+    let turnosAgendados = await consultarTurnosPorDiaYServicio(fecha, servicio,barbero);
 
     // Definimos el horario laboral.
     let inicioJornada = 10 * 60; // 10:00 en minutos desde la medianoche.
@@ -312,34 +495,38 @@ export const buscarTurnosDisponibles = async (fecha, servicio) => {
 export const verificarDisponibilidad = async (
   fecha,
   horaSolicitada,
-  servicio
+  servicio,
+  barbero
 ) => {
   try {
     // 1. Obtener todos los turnos para la fecha dada.
     const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(
       fecha,
-      servicio
+      servicio,
+      barbero
     );
     console.log('Turnos por día y servicio obtenidos:', turnosPorDiaYServicio);
 
     // 2. Obtener la duración del servicio solicitado.
     const duracionServicio = moment.duration(turnosPorDiaYServicio["Duración"]);
-    console.log('Duración del servicio:', duracionServicio);
 
-    // 3. Verificar disponibilidad en la hora solicitada.
+    // 3. Extraer el horario de inicio y fin del horario laboral del barbero.
+    const [inicioLaboral, finLaboral] = turnosPorDiaYServicio["HorarioLaboralBarbero"].split('/');
+
+    // 4. Verificar disponibilidad en la hora solicitada.
     // Calcula el intervalo de tiempo ocupado por el servicio solicitado.
     const horaInicioSolicitada = moment(horaSolicitada, "HH:mm");
     const horaFinSolicitada = moment(horaInicioSolicitada).add(duracionServicio);
 
-    // Verifica si la hora de inicio del turno solicitado es antes de las 10:00.
-    if (horaInicioSolicitada.isBefore(moment('10:00', 'HH:mm'))) {
-      console.log('El turno solicitado es demasiado temprano. Los turnos pueden comenzar a las 10:00 como muy temprano.');
+    // Verifica si la hora de inicio del turno solicitado es antes del inicio del horario laboral.
+    if (horaInicioSolicitada.isBefore(moment(inicioLaboral, 'HH:mm'))) {
+      console.log('El turno solicitado es demasiado temprano. Los turnos pueden comenzar a las ' + inicioLaboral + ' como muy temprano.');
       return false;
     }
 
     // Verifica si la hora de finalización del turno solicitado excede el horario laboral.
-    if (horaFinSolicitada.isAfter(moment('20:00', 'HH:mm'))) {
-      console.log('El turno solicitado termina después del horario laboral. Los turnos deben terminar a las 20:00 como muy tarde.');
+    if (horaFinSolicitada.isAfter(moment(finLaboral, 'HH:mm'))) {
+      console.log('El turno solicitado termina después del horario laboral. Los turnos deben terminar a las ' + finLaboral + ' como muy tarde.');
       return false;
     }
 
@@ -374,29 +561,41 @@ export const verificarDisponibilidad = async (
   }
 };
 
-export const buscarHorariosDisponibles = async (fecha, servicio) => {
+export const buscarHorariosDisponibles = async (fecha, servicio, barbero) => {
   try {
-    const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fecha, servicio);
-    const duracionServicio = parseInt(turnosPorDiaYServicio["Duración"].split(":")[0]);
+    console.log("parametros:",fecha,servicio,barbero)
+    const turnosPorDiaYServicio = await consultarTurnosPorDiaYServicio(fecha, servicio, barbero);
+    console.log("trurnosPorDiayServicio",turnosPorDiaYServicio)
+    const duracionArray = turnosPorDiaYServicio["Duración"][0].split(":");
+    const duracionServicio = parseInt(duracionArray[0]) * 60 + parseInt(duracionArray[1]);
+    
+    console.log("duracionServicio",duracionServicio)
+    const horarioLaboralBarbero = turnosPorDiaYServicio["HorarioLaboralBarbero"].split("/");
+    let horaInicioJornada = moment(horarioLaboralBarbero[0], 'HH:mm');
+    console.log("horaInicioJor",horaInicioJornada)
+    const horaFinJornada = moment(horarioLaboralBarbero[1], 'HH:mm');
+
     let horariosDisponibles = [];
-    let horaInicioJornada = moment('10:00', 'HH:mm');
-    const horaFinJornada = moment('20:00', 'HH:mm');
 
     while (horaInicioJornada.isSameOrBefore(horaFinJornada)) {
       let disponible = true;
-      const horaFinSolicitada = moment(horaInicioJornada).add(duracionServicio, 'hours');
+      const horaInicioSolicitada = moment(horaInicioJornada);
+      const horaFinSolicitada = moment(horaInicioJornada).add(duracionServicio, 'minutes');
 
       if (horaFinSolicitada.isAfter(horaFinJornada)) {
         break;
       }
-
       for (let i = 0; i < turnosPorDiaYServicio["Inicio"].length; i++) {
-        const horaInicioTurno = moment(turnosPorDiaYServicio["Inicio"][i], 'HH:mm');
-        const horaFinTurno = moment(turnosPorDiaYServicio["Finalizacion"][i], 'HH:mm');
-
-        if ((horaInicioJornada.isSameOrAfter(horaInicioTurno) && horaInicioJornada.isBefore(horaFinTurno)) ||
-            (horaFinSolicitada.isAfter(horaInicioTurno) && horaFinSolicitada.isSameOrBefore(horaFinTurno)) ||
-            (horaInicioJornada.isBefore(horaInicioTurno) && horaFinSolicitada.isAfter(horaFinTurno))) {
+        const horaInicioTurno = moment(turnosPorDiaYServicio["Inicio"][i], "HH:mm");
+        const horaFinTurno = moment(turnosPorDiaYServicio["Finalizacion"][i], "HH:mm");
+        if (
+          (horaInicioSolicitada.isSameOrAfter(horaInicioTurno) &&
+            horaInicioSolicitada.isBefore(horaFinTurno)) ||
+          (horaFinSolicitada.isAfter(horaInicioTurno) && 
+            horaFinSolicitada.isSameOrBefore(horaFinTurno)) ||
+          (horaInicioSolicitada.isSameOrBefore(horaInicioTurno) && 
+            horaFinSolicitada.isSameOrAfter(horaFinTurno))
+        ) {
           disponible = false;
           break;
         }
@@ -406,7 +605,6 @@ export const buscarHorariosDisponibles = async (fecha, servicio) => {
         horariosDisponibles.push(horaInicioJornada.format('HH:mm'));
       }
 
-      // Incrementar la hora de inicio en incrementos de 30 minutos.
       horaInicioJornada.add(30, 'minutes');
     }
 
@@ -417,18 +615,88 @@ export const buscarHorariosDisponibles = async (fecha, servicio) => {
   }
 };
 
-export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio) => {
+export const obtenerDiasDeTrabajo = async (barbero) => {
+  const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  let diasLaborables = [];
+  const CREDENTIALS = {
+    "type": "service_account",
+    "project_id": "calendar-turnos-400220",
+    "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+    "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+    "client_id": "107884470593691798095",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }
+  
+  // Autenticación y carga de información.
+  await doc.useServiceAccountAuth(CREDENTIALS);
+  await doc.loadInfo();
+
+  // Acceso a la "Hoja 3".
+  let sheet = doc.sheetsByTitle["Hoja 3"];
+
+  // Obtención de todas las filas.
+  let rows = await sheet.getRows();
+
+  // Búsqueda del barbero en las filas.
+  for (let index = 0; index < rows.length; index++) {
+    const row = rows[index];
+    const nombreBarbero = row._rawData[0];
+
+    if (nombreBarbero === barbero) {
+      // Si se encuentra el barbero, se procesan sus días de trabajo.
+      const diasDeTrabajo = row._rawData[1];
+
+      // Divide los días de trabajo por comas.
+      const partes = diasDeTrabajo.split(',');
+
+      partes.forEach(parte => {
+        parte = parte.trim(); // Elimina los espacios en blanco al principio y al final.
+
+        if (parte.includes('-')) {
+          // Si la parte incluye un guión, es un rango de días.
+          const [inicio, fin] = parte.split('-');
+          const indiceInicio = dias.indexOf(inicio);
+          const indiceFin = dias.indexOf(fin);
+
+          // Añade todos los días en el rango al array de días laborables.
+          for (let i = indiceInicio; i <= indiceFin; i++) {
+            diasLaborables.push(i);
+          }
+        } else {
+          // Si la parte no incluye un guión, es un solo día.
+          const indice = dias.indexOf(parte);
+          diasLaborables.push(indice);
+        }
+      });
+
+      break; // Termina la búsqueda una vez que se encuentran los días de trabajo del barbero.
+    }
+  }
+
+  return diasLaborables;
+};
+
+export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio, barbero) => {
   try {
     // Convierte la fecha de inicio al formato de Moment.js.
-    let fecha = moment(fechaInicio, 'DD/MM/YY').add(1, 'days');
+    let fecha = moment(fechaInicio, 'DD/MM/YY');
+    // Obtiene los días de trabajo del barbero.
+    const diasDeTrabajo = await obtenerDiasDeTrabajo(barbero);
+    // Verifica la disponibilidad para el día actual y el siguiente.
+    const diasDeTrabajoString = String(diasDeTrabajo);
+    const diasDeTrabajoArray = diasDeTrabajoString.split(',').map(Number);
+    for (let i = 0; i < 2; i++) {
+      // Verifica si el día es un día de trabajo para el barbero.
+      if (diasDeTrabajoArray.includes(fecha.day())) {
 
-    // Verifica la disponibilidad para los próximos 3 días.
-    for (let i = 0; i < 3; i++) {
-      // Verifica si el día es entre martes y sábado.
-      if (fecha.day() >= 2 && fecha.day() <= 6) {
         // Busca los horarios disponibles para este día.
-        const horariosDisponibles = await buscarHorariosDisponibles(fecha.format('DD/MM/YY'), servicio);
-        
+        const horariosDisponibles = await buscarHorariosDisponibles(fecha.format('DD/MM/YY'), servicio,barbero);
+        console.log(horariosDisponibles);
         if (horariosDisponibles.length > 0) {
           return {
             Fecha: fecha.format('DD/MM/YY'),
@@ -441,9 +709,9 @@ export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio
       fecha.add(1, 'days');
     }
 
-    // Si no se encontró ningún día disponible en los próximos 3 días, devuelve un mensaje indicando esto.
+    // Si no se encontró ningún día disponible en los próximos 2 días, devuelve un mensaje indicando esto.
     return {
-      Mensaje: 'No se encontraron días disponibles en los próximos 3 días.'
+      Mensaje: 'No se encontraron días disponibles en los próximos 2 días.'
     };
   } catch (error) {
     // Maneja cualquier error que pueda haber ocurrido.
@@ -452,13 +720,12 @@ export const buscarProximoDiaYHorariosDisponibles = async (servicio, fechaInicio
       Mensaje: 'Ocurrió un error al buscar los próximos días y horarios disponibles.'
     };
   }
-}
+};
 
-
-export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio) => {
+export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, servicio, barbero) => {
   try {
     // Primero verifica la disponibilidad del horario solicitado.
-    const horarioAprobado = await verificarDisponibilidad(fecha, horaSolicitada, servicio);
+    const horarioAprobado = await verificarDisponibilidad(fecha, horaSolicitada, servicio, barbero);
     console.log('Horario aprobado:', horarioAprobado);
 
     if (horarioAprobado) {
@@ -469,7 +736,7 @@ export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, serv
       };
     } else {
       // Si el horario solicitado no está disponible, busca el próximo día disponible y sus horarios.
-      const proximoDiaYHorarios = await buscarProximoDiaYHorariosDisponibles(servicio,fecha);
+      const proximoDiaYHorarios = await buscarProximoDiaYHorariosDisponibles(servicio,fecha,barbero);
       console.log('Próximo día y horarios disponibles:', proximoDiaYHorarios);
 
       if (proximoDiaYHorarios.Mensaje) {
@@ -490,34 +757,37 @@ export const verificarYBuscarDisponibilidad = async (fecha, horaSolicitada, serv
     throw error;
   }
 };
+
 export const cancelarTurnoPorPosicion = async(telefono, posicionTurno)=> {
   // Primero, obtén todos los turnos.
+  const CREDENTIALS ={
+    "type": "service_account",
+    "project_id": "calendar-turnos-400220",
+    "private_key_id": "bd34687a0a364a900d0c7a275c19bf79914d0e75",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDEe9+CZgDNv4j4\nsHgdnszTuS6HT+9F6f3bQUB/Qi+q1zswlsCNNdiJq/xte0w1VNfnHRFlBfy79CTO\ntm0w2ny5cuT0RmxXOeACKnY80jiwb/FDlBV5YIzeUiCn2B1zoB6hTevVSC/+df4z\ntyCLWEw+Ggrux48s7Fudlda1sq+kp+kyEr3C8Pa4dAJn4j/0QMGhPSSdMb3eQSzF\nC+ymn0oA6ntPFPEwez63sMeZlEcrIAtQCVgJjn5u9T6/58dr1snk9F73qbnAwgAP\nCe7SRjJzgt+neat/KWtX5pxkCvgpeUsOC5rZFgbFzjYnly1B3wdVT3x/VMmFv0yX\nS5/h98TjAgMBAAECggEADgNwYqpSwVnj839mjw+YjTsxEdkwzWbjF6RU7MlJgWDz\naZjpknNg28TRQ/UIxOmlsmfqKdneTNYcr++ROcGY0ViGnX4jqP70NpiqW9Z50OpS\n+0kQVQVUAWE7JK1vFaQ5uwhwha2DMB4LQMtSqLg7S9dAqLIWnejHn1AkraCDvXWq\nUg1HnjffENx5IiWHAob24u5551xsxVHjVJSU+7RSzET/uMrmyDBCndf3pON8N0bU\n8wL53JE0rapBbjmH03k6Xn+RE+vUWluHLiDNAOg4Y/9MaRB16iaxP0xKeI9/6drr\nFwgjUZTz437SfOmKVxFLCP4O5ZqdDxFRKPmprtQDEQKBgQDpDBMwzqXvxGxo0AYx\n9wkIBT7kZUQXk3B1/XCQ4eYZpNtv5UZCD9d5j+WQ9rOKgsUjy1fYSpUWrxrO8fg5\nauv5XhmIQ2Kx0vJ4zEJpnbrsiNIPeTTd0/2g8zxrF7D54ES53SuiPJUVgZ3aYZO+\nbzWajDJSykDC+PXEgJzJTXqqcQKBgQDX1elCZ4vQBnwYHMjZeMA24+mcpniOG37F\nafcxlJ6LKWY6dle9XyWxc31AEH2+wtMALEp8OFtwC3438zxUP9NkIFSfbwbooJVl\n44cdH5d6vSFzciTWb0jHNUA8cVmFIq85wTcuTz8AhbxpxbzuZHyG4r2iJRbyYo7T\nK5GejT1GkwKBgHvDAd4FoHH4qmnvL5sRSiaMQp4geUzb6/l9Im6OyRgNSMvfwrQK\nna/dD1kw6qBAWllr/7bJxOtLCr2kGuLDOZYwtvZ6cstk74ffUdWtAjvjXUsCX2T+\n087J3egxqLbKtzTNlAKQkcveDeqPr1qOzLTKh18YMdRZSouUka8GCoLBAoGAUq69\npxSnuM9jJpGQV88sQ1rYGYykTjw2OkY3ziSS/9iiMu82+XLDq9EEQFCQ+00DK+PL\nvP6R+MBOX/ysNdIllwvTnygXS3KJCPk6v2tkyj493E3z0rna9YVu0DjUBG6fFc7w\n5qqxBfA1l4eKswCHu9yMrNrsiXo8IKVmKYkN2kUCgYA0wc3E3LfS365TY/nfqb4W\n5YnwJKRlF1/r64Cx8Qk1udv7LwYlt27DbeeMAJRDk/vu4q3CFwnaeissJ5adc1Jz\n54wm+sSsy9xIAQ6vH5+apasEs3HlM8kk/OQ15yih7vjcjApaJE+xkV+ly5Y5TkRo\nXDV9seAvU9vYc8XeOJG4bg==\n-----END PRIVATE KEY-----\n",
+    "client_email": "agendaturno@calendar-turnos-400220.iam.gserviceaccount.com",
+    "client_id": "107884470593691798095",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/agendaturno%40calendar-turnos-400220.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }    
   let turnos = await consultarTurnos(telefono);
   let turnera= turnos.turnos
   // Luego, encuentra el turno que el usuario quiere cancelar.
   let turnoFecha = turnera.Fecha[posicionTurno-1];
   let turnoInicio = turnera.Inicio[posicionTurno-1];
+  let barbero = turnera.Barbero[posicionTurno-1];
   let turnoBorrado = {
     dia: turnera.Fecha[posicionTurno-1],
     horario: turnera.Inicio[posicionTurno-1],
     servicio: turnera.Servicio[posicionTurno-1],
     nombre: turnera.Cliente[posicionTurno-1],
-    telefono: turnera.Telefono[posicionTurno-1]
+    telefono: turnera.Telefono[posicionTurno-1],
+    barbero: turnera.Barbero[posicionTurno-1],
   }
 
-  const CREDENTIALS = {
-    type: "service_account",
-    project_id: process.env.PROJECT_ID,
-    private_key_id: process.env.PRIVATE_KEY_ID,
-    private_key:process.env.PRIVATE_KEY,
-    client_email:process.env.CLIENT_EMAIL,
-    client_id:process.env.CLIENT_ID,
-    auth_uri:process.env.AUTH_URI,
-    token_uri:process.env.TOKEN_URI,
-    auth_provider_x509_cert_url:process.env.AUTH_PROVIDER_X509_CERT_URL,
-    client_x509_cert_url:process.env.CLIENT_X509_CERT_URL,
-    universe_domain: process.env.UNIVERSITY_DOMAIN,
-  };
   // A continuación, obtén la hoja de cálculo y autentícate.
   await doc.useServiceAccountAuth(CREDENTIALS);
   await doc.loadInfo();
@@ -529,14 +799,14 @@ export const cancelarTurnoPorPosicion = async(telefono, posicionTurno)=> {
   // Busca la fila que corresponde al turno que el usuario quiere cancelar.
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
-    if (row._rawData[0] === turnoFecha && row._rawData[1] === turnoInicio) {
+    if (row._rawData[0] === turnoFecha && row._rawData[1] === turnoInicio && row._rawData[6] === barbero) {
       // Si encuentras la fila, elimínala.
       await row.delete();
       break;
     }
   }
   return turnoBorrado
-}
+};
 
 export default {
   consultarTurnos,
@@ -547,5 +817,7 @@ export default {
   verificarYBuscarDisponibilidad,
   buscarHorariosDisponibles,
   buscarProximoDiaYHorariosDisponibles,
-  cancelarTurnoPorPosicion
+  cancelarTurnoPorPosicion,
+  consultarServicios,
+  consultarProductos
 };  

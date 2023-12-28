@@ -34,30 +34,33 @@ const flowAgendar = bot
   `⏰ Por favor, dime a qué hora te gustaría tu turno. Recuerda usar el formato HH:MM, por ejemplo: 13:30⏱.`,
     { capture: true, delay : 2000 },
     async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-      clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
       let error = 0
       if (esHorarioValido(ctx.body)) {
         await state.update({ horario: ctx.body }); 
         await state.update({ telefono: ctx.from });
         const myState = state.getMyState();
-        console.log(myState.horario);
+        console.log(myState.barbero);
         const agendar = await agendarTurno(
           myState.dia,
           myState.horario,
           myState.servicio,
           myState.nombre,
-          myState.telefono
+          myState.telefono,
+          myState.barbero
         );
         
         console.log('Resultado de agendarTurno:', agendar);
-        if (agendar.Mensaje) {
-          flowDynamic(agendar.Mensaje)           
+        if (agendar.Mensaje && !agendar.DiasDisponibles.Horarios) {
+          console.log(agendar)
+          flowDynamic(agendar.Mensaje)  
+          return endFlow();        
+        }
+        else if(agendar.DiasDisponibles.Horarios && agendar.DiasDisponibles.Horarios.length > 0) {
+          flowDynamic("Lo siento😞, no hemos encontrado un turno disponible...")
           let nuevoDia = '';
           let listadoDeHorarios = '';
           let dia = agendar.DiasDisponibles;
+          console.log("dia",dia)
           let lista = '';
           dia.Horarios.sort();
           for (let i = 0; i < dia.Horarios.length; i++) {
@@ -71,15 +74,14 @@ timeoutId = setTimeout(() => {
           await state.update({horariosPosibles: listadoDeHorarios});
           await delay(2000)
           return await gotoFlow(flowReagendar)
-        } else {
-          flowDynamic(agendar)
-          return endFlow()
         }
       } else {
         error++
         await state.update({ errorHandler: error });
         const myState = state.getMyState();
         if(myState.errorHandler>=3){
+          error = 0
+          await state.update({ errorHandler: error });
           return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }
         flowDynamic(`Lo siento😞 , escribiste mal el horario\n

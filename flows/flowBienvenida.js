@@ -1,54 +1,41 @@
 import bot from "@bot-whatsapp/bot";
-/* import pkg from '@bot-whatsapp/bot'; */
-import flowSelecion1 from "./flowSeleccion.js";
+import flowSeleccion1 from "./flowSeleccion.js";
 import flowSeleccion2 from "./flowSeleccion2.js";
 import flowSeleccion3 from "./flowSeleccion3.js";
-import sendMessage from "../pruebaBaileys.js"
-/*import flowSeleccion4 from "./flowSeleccion4.js";
-import flowSeleccion5 from "./flowSeleccion5.js"; */
-/* const {EVENTS} = pkg;
-*/
-import {checkDates} from "../pruebaBaileys.js"
+/* import flowSeleccion4 from "./flowSeleccion4.js" */
+import flowSeleccion5 from "./flowSeleccion5.js"
+/* let timeoutId;  */
 let error = 0;
 const flowPrincipal = bot
-  .addKeyword("hola")
-  .addAnswer(`🌼 ¡Hola! 🌼 
-Bienvenido a Bel's Nails💅
-¿Cómo puedo ayudarte hoy? 
-Por favor,
-elige una opción para continuar:\n
-1️⃣📅 *reservar un turno*\n
-2️⃣🤔 *consultar o cambiar un turno*\n
-3️⃣❌ *cancelar un turno*\n
-4️⃣🕔 *ver turnos disponibles según la fecha*\n
-5️⃣❓ *preguntas frecuentes*
-
-Si en algún momento deseas
-detener la comunicación,
-simplemente escribe *cancelar*. 
-¡Estoy aquí para ayudarte! 😊`,
+  .addKeyword("tonta",{sensitive:false})
+  .addAnswer(`💈 ¡Hola! 💈 
+  Bienvenido a *Barbería Gambino* 
+  ¿Cómo puedo ayudarte hoy? 
+  Por favor,
+  elige una opción para continuar:\n
+  1️⃣📅 *Reservar un turno*\n
+  2️⃣🔄 *Consultar o cambiar un turno*\n
+  3️⃣❌ *Cancelar un turno*\n
+  4️⃣❓ *Preguntas frecuentes*
+  
+  Si en algún momento deseas
+  detener la comunicación,
+  simplemente escribe *cancelar*. 
+  ¡Estoy aquí para ayudarte! 😊`,//  4️⃣🗓️ *Ver turnos disponibles según la fecha*\n
     {capture:true, delay : 2000}, 
-    async (ctx,{state,gotoFlow,endFlow,flowDynamic})=> {
-      clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
-      console.log("ctx del flow Bienvenida:",ctx.body)
+    async (ctx,{state,gotoFlow,endFlow,flowDynamic})=> { 
       await state.update({ telefono: ctx.from });
       if(parseInt(ctx.body)==1){
-        /* return await flowDynamic(checkDates()) */
-        await gotoFlow(flowSelecion1)
+        await gotoFlow(flowSeleccion1)
       }else if(parseInt(ctx.body)==2){
-        console.log("entro en consultar o cambiar")
-        await gotoFlow(flowSeleccion2)
+         await gotoFlow(flowSeleccion2)
       } else if(parseInt(ctx.body)==3){
-        await gotoFlow(flowSeleccion3)
+        await gotoFlow(flowSeleccion3) 
       }/*else if(parseInt(ctx.body)==4){
         await gotoFlow(flowSeleccion4)
-      }else if(parseInt(ctx.body)==5){
+      }*/else if(parseInt(ctx.body)==4){
         await gotoFlow(flowSeleccion5)
-      } */
+      } 
       if(ctx.body.toLowerCase()=="cancelar"){
         return endFlow({body:'👋Nos vemos pronto!, en caso de volver a encenderme escribe *hola*'})
       }else{
@@ -58,6 +45,8 @@ timeoutId = setTimeout(() => {
         const myState = state.getMyState();
         console.log(myState.errorHandler)
         if(myState.errorHandler>=3){
+          error = 0
+          await state.update({ errorHandler: error });
           return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
         }
         return await gotoFlow(flowPrincipal)

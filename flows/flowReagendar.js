@@ -3,6 +3,7 @@ import { agendarTurno } from "../services/sheets/index.js";
 import flowCambiarFecha from "./flowCambiarFecha.js";
 import { cleanMessage } from "@whiskeysockets/baileys";
 
+let error=0
 function esHorarioValido(horario) {
   // Dividir la hora y los minutos
   var partes = horario.split(':');
@@ -34,11 +35,6 @@ const flowReagendar = bot
 .addAnswer(`⏲️ Por favor, ingresa explícitamente la hora que te gustaría reservar. Si deseas cambiar el día, escribe *Cambiar*.`,
          { capture: true, delay : 2000 },
          async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-          clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
           console.log("EL HORARIO DEL TURNO A CAMBIAR: " + ctx.body)
            const myState = state.getMyState();
           if(myState.horariosPosibles){
@@ -52,8 +48,9 @@ timeoutId = setTimeout(() => {
                   myState.servicio,
                   myState.nombre,
                   myState.telefono,
+                  myState.barbero
                 );
-                flowDynamic(agendar);
+                flowDynamic(agendar.Mensaje);
                 return endFlow(); 
             }
           }
@@ -67,11 +64,12 @@ timeoutId = setTimeout(() => {
                     myState.servicio,
                     myState.nombre,
                     myState.telefono,
+                    myState.barbero
                   );
-                  flowDynamic(agendar);
+                  flowDynamic(agendar.Mensaje);
                   return endFlow(); 
             } 
-             else if(ctx.body == "Cambiar"){
+             else if(ctx.body.toLowerCase() == "cambiar"){
               return await gotoFlow(flowCambiarFecha)
             }else{
               flowDynamic('❌ Parece que hubo un error al ingresar los datos. Por favor, intenta de nuevo.')
@@ -79,6 +77,8 @@ timeoutId = setTimeout(() => {
               await state.update({ errorHandler: error });
               const myState = state.getMyState();
               if(myState.errorHandler>=3){
+                error = 0
+                await state.update({ errorHandler: error });
                 return endFlow({body: '⚠️Has superado los 3 intentos. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
               }
               flowDynamic("Lo siento😔, no se encuentra disponible el horario seleccionado, vuelve a intentarlo...")

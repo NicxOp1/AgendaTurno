@@ -24,7 +24,7 @@ function validarFecha(fechaStr) {
   let hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  if (fecha <= hoy) {
+  if (fecha < hoy) {
     return { valido: false, log: errorMessages.notFutureDate };
   }
 
@@ -44,17 +44,15 @@ function validarFecha(fechaStr) {
   return { valido: true, log: "Fecha válida." };
 }
 const flowConsultar = bot
-.addKeyword("2",{ sensitive: true })
+.addKeyword("bot")
 .addAnswer(
    `Perfecto aquí se encuentran tus turnos ya agendados..
-Recuerda siempre que quieras *Cancelar*`,
-  {capture:false },
+Recuerda siempre que quieras salir escribe *Cancelar*`,
+  {capture:false, delay: 2000 },
   async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-    clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
+    if(ctx.body.toLowerCase=="cancelar"){
+      return endFlow({body: 'Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+    }
     const myState = state.getMyState();
     console.log(myState.telefono)
     let mensaje = await consultarTurnos(myState.telefono)
@@ -65,8 +63,7 @@ timeoutId = setTimeout(() => {
       await flowDynamic(mensaje.mensaje)
       return gotoFlow(flowSeleccionarTurno)
     }else{
-      flowDynamic("no tienes ningun turno agendado.!")
-      return endFlow()
+      return endFlow({body: 'Lo siento😔, no tienes ningún turno agendado!   Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
     }
   }
 )

@@ -1,18 +1,16 @@
  import bot from "@bot-whatsapp/bot";
 import {consultarTurnos} from '../services/sheets/index.js'
 import flowSeleccionarTurnoPBorrar from './flowSeleccionarTurnoPBorrar.js'
-const flowSelecion3 = bot
-.addKeyword("3",{ sensitive: true })
+const flowSeleccion3 = bot
+.addKeyword("bot")
 .addAnswer(
    `Perfecto aquí se encuentran tus turnos ya agendados..
-Recuerda siempre que quieras terminar escribe: *Cancelar*`,
+Recuerda siempre que quieras salir escribe *Cancelar*`,
   {capture:false },
   async (ctx, { state, flowDynamic,gotoFlow,endFlow }) => {
-    clearTimeout(timeoutId);
-timeoutId = setTimeout(() => {
-  endFlow({body: '⚠️Has superado el tiempo de espera. Por favor, escribe *Hola* para empezar de nuevo. ¡Gracias!'})
-}, 5 * 60 * 1000); // 5 minutos
-
+    if(ctx.body.toLowerCase=="cancelar"){
+      return endFlow({body: 'Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
+    }
     const myState = state.getMyState();
     /* console.log(myState.telefono) */
     let mensaje = await consultarTurnos(myState.telefono)
@@ -22,9 +20,8 @@ timeoutId = setTimeout(() => {
       await flowDynamic(mensaje.mensaje)
       return gotoFlow(flowSeleccionarTurnoPBorrar)
     }else{
-      flowDynamic("no tienes ningun turno agendado.!")
-      return endFlow()
+      return endFlow({body: 'Lo siento😔, no tienes ningún turno agendado!   Terminaste la conversación. Escribe *Hola* para empezar de nuevo. ¡Gracias!'})
     }
   }
 )
-export default flowSelecion3
+export default flowSeleccion3
